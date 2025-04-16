@@ -109,6 +109,12 @@ export function getPearlRatingLabel(rating: number): string {
 
 // File upload handler using base64 encoding
 export async function uploadFile(file: File): Promise<string> {
+  // Check if it's an image that can be compressed
+  if (file.type.startsWith('image/') && file.type !== 'image/gif') {
+    return compressAndEncodeImage(file);
+  }
+  
+  // For non-image files or gif files, use standard base64 encoding
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
@@ -120,8 +126,8 @@ export async function uploadFile(file: File): Promise<string> {
         // In a real production app, you would upload to a storage service 
         // For this demo, we'll use the base64 string directly as the URL
         resolve(base64String);
-      } catch (error) {
-        reject(new Error("Failed to process file"));
+      } catch (error: any) {
+        reject(new Error("Failed to process file: " + (error?.message || "Unknown error")));
       }
     };
     
@@ -131,5 +137,67 @@ export async function uploadFile(file: File): Promise<string> {
     
     // Read the file as a data URL (base64)
     reader.readAsDataURL(file);
+  });
+}
+
+// Helper function to compress and encode images
+function compressAndEncodeImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      
+      img.onload = () => {
+        // Create a canvas to resize the image
+        const canvas = document.createElement('canvas');
+        
+        // Set maximum dimensions (adjust as needed)
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
+        
+        let width = img.width;
+        let height = img.height;
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        // Set canvas dimensions and draw resized image
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error("Failed to get canvas context"));
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to data URL with compression (quality 0.7)
+        const dataUrl = canvas.toDataURL(file.type, 0.7);
+        resolve(dataUrl);
+      };
+      
+      img.onerror = () => {
+        reject(new Error("Failed to load image for compression"));
+      };
+    };
+    
+    reader.onerror = () => {
+      reject(new Error("Failed to read file for compression"));
+    };
   });
 }

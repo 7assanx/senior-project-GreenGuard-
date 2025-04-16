@@ -29,6 +29,17 @@ export default function DocumentItem({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Check file size (limit to 10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File too large",
+        description: "Please upload a file smaller than 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setIsUploading(true);
@@ -57,11 +68,11 @@ export default function DocumentItem({
       if (onUpload) {
         onUpload(newDocument);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading document:", error);
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your document. Please try again.",
+        description: error?.message || "There was an error uploading your document. Please try again.",
         variant: "destructive",
       });
     } finally {
