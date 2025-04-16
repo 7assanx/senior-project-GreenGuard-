@@ -737,6 +737,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Request more information (admin only)
+  app.post("/api/admin/applications/:id/request-info", isAdmin, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      const { feedback, status } = z.object({
+        feedback: z.string(),
+        status: z.string().default("needs_info")
+      }).parse(req.body);
+      
+      // Update application status
+      await storage.updateApplication(applicationId, {
+        status: status,
+        updatedAt: new Date()
+      });
+      
+      // Here you could also add notification logic to inform the user
+      // e.g., store the feedback in a messages collection, send an email, etc.
+      
+      res.json({ 
+        message: "Request for additional information sent successfully",
+        feedback
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      console.error("Error requesting more info:", error);
+      res.status(500).json({ message: "Failed to request additional information" });
+    }
+  });
+  
   // FIRM ROUTES
   
   // Get all approved firms
