@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft } from "lucide-react";
+import logoImage from "../assets/logo.png";
 import {
   Dialog,
   DialogContent,
@@ -100,13 +102,21 @@ export default function UserLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 relative">
+      <div className="absolute top-4 left-4">
+        <Button 
+          variant="ghost" 
+          className="flex items-center text-primary hover:bg-green-50" 
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
+        </Button>
+      </div>
       <Card className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
         <div className="text-center">
           <div className="flex justify-center">
             <div className="flex items-center">
-              <i className="ri-shield-check-line text-primary text-3xl mr-2"></i>
-              <span className="font-bold text-xl text-primary-dark">Green Guard</span>
+              <img src={logoImage} alt="Green Guard Logo" className="h-14 w-auto" />
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-neutral-900">User Login</h2>
