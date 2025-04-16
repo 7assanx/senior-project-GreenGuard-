@@ -88,8 +88,11 @@ export default function AdminReview() {
     // Proceed with submission regardless of form state
     setIsSubmitting(true);
     try {
+      // Convert score to integer by rounding (multiply by 10 to keep 1 decimal place precision)
+      const scoreAsInteger = Math.round(Number(values.score) * 10);
+      
       const payload = {
-        score: values.score,
+        score: scoreAsInteger,
         level: values.level,
         feedback: values.feedback,
         pdfUrl: values.generateCertificate ? `/certificates/application-${applicationId}.pdf` : undefined,
@@ -467,7 +470,11 @@ export default function AdminReview() {
                               Request More Information
                             </Button>
                             <Button
-                              type="submit"
+                              type="button"
+                              onClick={() => {
+                                const values = form.getValues();
+                                onSubmit(values);
+                              }}
                               disabled={isSubmitting}
                               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                             >
@@ -475,7 +482,7 @@ export default function AdminReview() {
                                 <>
                                   <i className="ri-loader-2-line animate-spin mr-1"></i> Processing...
                                 </>
-                              ) : "Approve Certification"}
+                              ) : "Approve"}
                             </Button>
                           </div>
                         </form>
