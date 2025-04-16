@@ -1,0 +1,141 @@
+Perfect! Here's a **detailed step-by-step breakdown** of **what the user does** and **what the admin does** on the Green Guard platform — clear and easy to follow:
+
+---
+
+## 👤 USER STEPS (From Registration to Certification)
+
+### 🟢 **Step 1: Register / Login**
+- User visits Green Guard homepage.
+- Clicks **"Sign In"** → selects **User Portal**.
+- If new: fills in the **registration form**.
+- If existing: enters **username and password** to log in.
+
+---
+
+### 🟢 **Step 2: Access Dashboard**
+- After login, the **User Dashboard** opens.
+- Sees:
+  - Application progress bar.
+  - Notifications (from AI or Admin).
+  - “Start Application” button.
+
+---
+
+### 🟢 **Step 3: Start Application**
+- Clicks **"Start Application"**.
+- Sees a checklist of **required documents**.
+- Can preview **document descriptions and examples**.
+
+---
+
+### 🟢 **Step 4: View & Contact Approved Firms**
+- Opens **Contact Firms** page (optional help).
+- Sees list of **approved consultants and firms**.
+- Uses **email/chat feature** to reach out if help is needed.
+
+---
+
+### 🟢 **Step 5: Upload Documents**
+- Goes back to Application Page.
+- Uploads each document (PDFs, images, etc.).
+- Each file gets a ✅ on the checklist once uploaded.
+
+---
+
+### 🟢 **Step 6: Get AI Feedback**
+- After uploading, clicks **"Get Feedback"**.
+- Documents are analyzed by the **AI model**.
+- AI shows:
+  - What’s correct
+  - What needs improvement
+
+---
+
+### 🟢 **Step 7: Revise Documents (if needed)**
+- User makes improvements based on AI feedback.
+- Re-uploads corrected documents.
+
+---
+
+### 🟢 **Step 8: Submit Application**
+- Once all documents are complete and valid:
+  - **"Submit Application"** button is activated.
+- User clicks it to send the full application for admin review.
+
+---
+
+### 🟢 **Step 9: Wait for Review**
+- Application status changes to **“Under Review”**.
+- May receive:
+  - Feedback from admin
+  - Requests for more files
+
+---
+
+### 🟢 **Step 10: View Result**
+- If **approved**:
+  - Receives a **PDF certification**.
+  - Can download it from the Dashboard.
+- If **rejected**:
+  - Sees reason and can reapply after corrections.
+
+---
+
+## 👨‍💼 ADMIN STEPS (From Login to Issuing Certificate)
+
+### 🔵 **Step 1: Admin Login**
+- Admin clicks **"Sign In"** → selects **Employee Portal**.
+- Enters **credentials** and logs in.
+
+---
+
+### 🔵 **Step 2: Admin Dashboard**
+- Sees:
+  - List of **pending applications**.
+  - Overview of approved/rejected ones.
+  - Status filters and quick search.
+
+---
+
+### 🔵 **Step 3: Review Application**
+- Clicks a user’s **pending application**.
+- Views:
+  - Uploaded documents
+  - AI feedback (optional)
+  - Application status
+
+---
+
+### 🔵 **Step 4: Compare with Rules**
+- Manually compares documents to **Estidama rules**.
+- May refer to:
+  - Pearl Building Rating System
+  - PBRS checklist
+
+---
+
+### 🔵 **Step 5: Take Action**
+- If **files are missing or incorrect**:
+  - Sends feedback to the user.
+  - Changes status to **“Needs Update”**.
+- If **everything is valid**:
+  - Assigns **score** based on compliance.
+  - Generates the **PDF certificate**.
+
+---
+
+### 🔵 **Step 6: Approve or Reject**
+- If passed:
+  - Clicks **“Approve”** → attaches certificate → user notified.
+- If failed:
+  - Clicks **“Reject”**, provides reason → user notified.
+
+---
+
+### 🔵 **Step 7: Final Record Keeping**
+- Application is moved to **Approved** or **Rejected** list.
+- Status and scores saved in the database.
+
+---
+
+Would you like a **flowchart** or **diagram** version of this? I can also convert this into documentation or use it as the basis to generate React components and backend routes.
