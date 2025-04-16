@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import MobileHeader from "@/components/MobileHeader";
@@ -212,6 +212,14 @@ export default function UserDashboard() {
                                     : app.status === "needs_info"
                                     ? "Additional Information Requested"
                                     : "Application Updated"}
+                                    {app.status === "needs_info" && app.feedbackMessage && (
+                                      <span className="block mt-1 text-xs text-orange-700">
+                                        <i className="ri-information-line mr-1"></i> Admin left feedback - 
+                                        <Link to={`/applications/${app.id}`} className="ml-1 underline font-medium">
+                                          view details
+                                        </Link>
+                                      </span>
+                                    )}
                                 </p>
                                 <div className="ml-2 flex-shrink-0 flex">
                                   <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
