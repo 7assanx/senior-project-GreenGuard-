@@ -17,12 +17,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     session({
       secret: "green-guard-secret",
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false, // Changed from true to false
       cookie: { 
         secure: false, // Set to false for development, true in production
         sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        httpOnly: true
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        httpOnly: true,
+        path: '/'
       },
       store: new MemoryStoreSession({
         checkPeriod: 86400000, // prune expired entries every 24h
@@ -75,7 +76,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set the user session
       (req.session as any).userId = user.id;
       
-      res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role });
+      // Save the session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+        res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role });
+      });
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: fromZodError(error).message });

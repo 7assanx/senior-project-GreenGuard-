@@ -61,16 +61,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include",
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Invalid username or password");
+        throw new Error(responseData.message || "Invalid username or password");
       }
 
-      const userData = await response.clone().json();
-      setUser(userData);
+      setUser(responseData);
       
       // Redirect based on user role
-      if (userData.role === "admin") {
+      if (responseData.role === "admin") {
         navigate("/admin/dashboard");
       } else {
         navigate("/dashboard");
@@ -94,13 +94,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include",
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Registration failed. Please try again.");
+        throw new Error(responseData.message || "Registration failed. Please try again.");
       }
 
-      const user = await response.clone().json();
-      setUser(user);
+      setUser(responseData);
       navigate("/dashboard");
     } catch (error) {
       console.error("Registration failed:", error);
