@@ -103,17 +103,22 @@ export function calculateProgress(
   
   // If we have document upload info, use it to calculate more precise progress
   if (typeof docsUploaded === 'number' && typeof totalDocs === 'number' && totalDocs > 0) {
+    // Calculate proportion of documents uploaded, scaled to 0-100
     const uploadPercentage = Math.min(100, Math.round((docsUploaded / totalDocs) * 100));
     
-    // Blend the upload percentage with the step-based progress
+    // For upload step, scale between 25-75% based on document uploads
     if (currentStep === "upload") {
-      return Math.max(25, Math.min(75, uploadPercentage));
-    } else if (currentStep === "feedback") {
-      return Math.max(75, uploadPercentage);
+      // Calculate a weighted progress that starts at 25% and maxes at 75%
+      return 25 + (uploadPercentage * 0.5);
+    } 
+    // For feedback step, scale between 75-95% based on document uploads
+    else if (currentStep === "feedback") {
+      // Already in feedback stage, so at least 75% complete
+      return 75 + (uploadPercentage * 0.2);
     }
   }
   
-  // Default step-based progress calculation
+  // Default step-based progress calculation when we don't have document counts
   switch (currentStep) {
     case "requirements":
       return 25;
