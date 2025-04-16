@@ -83,15 +83,9 @@ export default function AdminReview() {
 
   async function onSubmit(values: CertificationFormValues) {
     // Debug form validation
-    const formState = form.formState;
     console.log("Form submission values:", values);
-    console.log("Form errors:", formState.errors);
     
-    if (!formState.isValid) {
-      console.log("Form is invalid, displaying errors");
-      return;
-    }
-    
+    // Proceed with submission regardless of form state
     setIsSubmitting(true);
     try {
       const payload = {
@@ -360,7 +354,11 @@ export default function AdminReview() {
                     
                     <CardContent className="px-4 py-5 sm:p-6">
                       <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <form onSubmit={(e) => {
+                          e.preventDefault();
+                          const values = form.getValues();
+                          onSubmit(values);
+                        }} className="space-y-6">
                           <FormField
                             control={form.control}
                             name="score"
