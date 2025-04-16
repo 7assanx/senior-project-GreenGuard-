@@ -82,14 +82,28 @@ export default function AdminReview() {
   });
 
   async function onSubmit(values: CertificationFormValues) {
+    // Debug form validation
+    const formState = form.formState;
+    console.log("Form submission values:", values);
+    console.log("Form errors:", formState.errors);
+    
+    if (!formState.isValid) {
+      console.log("Form is invalid, displaying errors");
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
-      await apiRequest("POST", `/api/admin/applications/${applicationId}/certify`, {
+      const payload = {
         score: values.score,
         level: values.level,
         feedback: values.feedback,
         pdfUrl: values.generateCertificate ? `/certificates/application-${applicationId}.pdf` : undefined,
-      });
+      };
+      
+      console.log("Submitting certification with payload:", payload);
+      
+      await apiRequest("POST", `/api/admin/applications/${applicationId}/certify`, payload);
       
       toast({
         title: "Certification approved",
@@ -378,7 +392,11 @@ export default function AdminReview() {
                               <FormItem className="mb-6">
                                 <FormLabel className="block text-sm font-medium text-neutral-700">Certification Level</FormLabel>
                                 <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <Select 
+                                    onValueChange={field.onChange} 
+                                    value={field.value}
+                                    defaultValue={field.value}
+                                  >
                                     <SelectTrigger className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-neutral-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
                                       <SelectValue placeholder="Select level..." />
                                     </SelectTrigger>
