@@ -165,18 +165,20 @@ export default function ApplicationCard({
         {/* Admin Action Buttons (for all applications) */}
         {isAdmin && (
           <div className="px-4 py-3 sm:px-6 border-t border-neutral-200 bg-neutral-50 flex justify-end space-x-3">
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary-50"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                navigate(`/admin/review/${application.id}`);
-              }}
-            >
-              <i className="ri-search-line mr-1"></i> Review
-            </Button>
+            {application.status !== "approved" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary-50"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/admin/review/${application.id}`);
+                }}
+              >
+                <i className="ri-search-line mr-1"></i> Review
+              </Button>
+            )}
             
             {application.status === "pending" && (
               <>
