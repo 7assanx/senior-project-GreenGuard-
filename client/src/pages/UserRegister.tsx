@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 import logoImage from "../assets/logo.png";
 
 const registerSchema = z.object({
@@ -64,7 +65,16 @@ export default function UserRegister() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 relative">
+      <div className="absolute top-4 left-4">
+        <Button 
+          variant="ghost" 
+          className="flex items-center text-primary hover:bg-green-50" 
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
+        </Button>
+      </div>
       <Card className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
         <div className="text-center">
           <div className="flex justify-center">
