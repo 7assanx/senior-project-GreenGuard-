@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -28,6 +28,7 @@ export default function UserRegister() {
   const { register } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [_, navigate] = useLocation();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -207,9 +208,9 @@ export default function UserRegister() {
             </Button>
             
             <div className="text-center text-sm mt-4">
-              <p>Already have an account? <Link href="/login">
-                <a className="font-medium text-primary hover:text-primary-dark">Sign in</a>
-              </Link></p>
+              <p>Already have an account? <span 
+                onClick={() => navigate("/login")}
+                className="font-medium text-primary hover:text-primary-dark cursor-pointer">Sign in</span></p>
             </div>
           </form>
         </Form>
