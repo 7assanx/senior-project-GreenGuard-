@@ -73,6 +73,31 @@ export default function AdminLogin() {
       setIsLoading(false);
     }
   }
+  
+  async function onForgotPasswordSubmit(values: ForgotPasswordFormValues) {
+    setIsResettingPassword(true);
+    try {
+      // Simulate API call to request password reset
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Password reset email sent",
+        description: `If an admin account with the email ${values.email} exists, you will receive password reset instructions.`,
+      });
+      
+      // Close the dialog after successful submission
+      setShowForgotPasswordDialog(false);
+      forgotPasswordForm.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send password reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50">
@@ -151,9 +176,13 @@ export default function AdminLogin() {
               />
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-primary hover:text-primary-dark">
+                <button 
+                  type="button"
+                  onClick={() => setShowForgotPasswordDialog(true)}
+                  className="font-medium text-primary hover:text-primary-dark"
+                >
                   Forgot your password?
-                </a>
+                </button>
               </div>
             </div>
 
@@ -182,6 +211,62 @@ export default function AdminLogin() {
           </form>
         </Form>
       </Card>
+      
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPasswordDialog} onOpenChange={setShowForgotPasswordDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reset Admin Password</DialogTitle>
+            <DialogDescription>
+              Enter your admin email address and we'll send you instructions to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...forgotPasswordForm}>
+            <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
+              <FormField
+                control={forgotPasswordForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Email</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="admin@example.com" 
+                        {...field} 
+                        className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowForgotPasswordDialog(false)}
+                  className="mt-2"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isResettingPassword}
+                  className="mt-2"
+                >
+                  {isResettingPassword ? (
+                    <>
+                      <i className="ri-loader-2-line animate-spin mr-2"></i> Sending...
+                    </>
+                  ) : "Send Reset Instructions"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
