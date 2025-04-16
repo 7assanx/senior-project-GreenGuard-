@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import logoImage from "../assets/logo.png";
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -24,7 +25,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <div className="flex items-center">
-                  <i className="ri-shield-check-line text-primary text-3xl mr-2"></i>
+                  <img src={logoImage} alt="Green Guard Logo" className="h-8 w-auto mr-2" />
                   <span className="font-bold text-xl text-primary-dark">Green Guard</span>
                 </div>
               </div>
