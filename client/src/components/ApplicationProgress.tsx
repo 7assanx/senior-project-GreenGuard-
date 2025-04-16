@@ -56,32 +56,32 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "Document Requirements", 
       description: "Review all required documents",
       icon: "ri-check-line",
-      isCompleted: currentStepIndex > 0 || application.progress >= 25,
-      isActive: application.currentStep === "requirements"
+      isCompleted: currentStepIndex > 0 || currentApplication.progress >= 25,
+      isActive: currentApplication.currentStep === "requirements"
     },
     { 
       id: "upload", 
       label: "Upload Documents", 
       description: "Upload the required files",
       icon: "ri-file-upload-line",
-      isCompleted: currentStepIndex > 1 || application.progress >= 50,
-      isActive: application.currentStep === "upload"
+      isCompleted: currentStepIndex > 1 || currentApplication.progress >= 50,
+      isActive: currentApplication.currentStep === "upload"
     },
     { 
       id: "feedback", 
       label: "AI Feedback", 
       description: "Get AI analysis of your documents",
       icon: "ri-robot-line",
-      isCompleted: currentStepIndex > 2 || application.progress >= 75 || application.status !== "draft",
-      isActive: application.currentStep === "feedback"
+      isCompleted: currentStepIndex > 2 || currentApplication.progress >= 75 || currentApplication.status !== "draft",
+      isActive: currentApplication.currentStep === "feedback"
     },
     { 
       id: "submitted", 
       label: "Submit Application", 
       description: "Final review and submission",
       icon: "ri-send-plane-line",
-      isCompleted: application.status !== "draft" || application.progress >= 100,
-      isActive: application.currentStep === "submitted"
+      isCompleted: currentApplication.status !== "draft" || currentApplication.progress >= 100,
+      isActive: currentApplication.currentStep === "submitted"
     }
   ];
 
@@ -98,29 +98,29 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       <CardContent className="px-4 py-5 sm:p-6">
         <div className="mb-6">
           <h4 className="text-base font-medium text-neutral-900 mb-2">
-            {application.projectType === "PBRS" ? "Pearl Building Rating System (PBRS)" : 
-             application.projectType === "PCRS" ? "Pearl Community Rating System (PCRS)" :
-             application.projectType === "PVRS" ? "Pearl Villa Rating System (PVRS)" :
-             application.projectType === "Public Realm" ? "Public Realm Rating System" : 
-             application.projectType}
+            {currentApplication.projectType === "PBRS" ? "Pearl Building Rating System (PBRS)" : 
+             currentApplication.projectType === "PCRS" ? "Pearl Community Rating System (PCRS)" :
+             currentApplication.projectType === "PVRS" ? "Pearl Villa Rating System (PVRS)" :
+             currentApplication.projectType === "Public Realm" ? "Public Realm Rating System" : 
+             currentApplication.projectType}
           </h4>
           <div className="w-full bg-neutral-200 rounded-full h-2.5">
             <div 
-              className="bg-primary h-2.5 rounded-full" 
-              style={{ width: `${application.status === "pending" || application.status === "in_progress" || application.status === "approved" ? 100 : progress}%` }}
+              className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-in-out" 
+              style={{ width: `${currentApplication.status === "pending" || currentApplication.status === "in_progress" || currentApplication.status === "approved" ? 100 : progress}%` }}
             ></div>
           </div>
           <div className="flex justify-between mt-1">
             <span className="text-sm text-neutral-500">
-              {application.status === "pending" || application.status === "in_progress" || application.status === "approved" ? "100" : progress}% Complete
+              {currentApplication.status === "pending" || currentApplication.status === "in_progress" || currentApplication.status === "approved" ? "100" : progress}% Complete
             </span>
             <span className="text-sm text-neutral-500">
-              Status: {application.status === "draft" ? "Document Collection" : 
-                      application.status === "pending" ? "Under Review" :
-                      application.status === "in_progress" ? "Being Processed" :
-                      application.status === "approved" ? "Approved" :
-                      application.status === "rejected" ? "Rejected" :
-                      application.status}
+              Status: {currentApplication.status === "draft" ? "Document Collection" : 
+                      currentApplication.status === "pending" ? "Under Review" :
+                      currentApplication.status === "in_progress" ? "Being Processed" :
+                      currentApplication.status === "approved" ? "Approved" :
+                      currentApplication.status === "rejected" ? "Rejected" :
+                      currentApplication.status}
             </span>
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
         
         {/* Action button */}
         <div className="mt-6">
-          <Link href={`/applications/${application.id}`}>
+          <Link href={`/applications/${currentApplication.id}`}>
             <Button variant="default" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
               Continue Application
             </Button>
