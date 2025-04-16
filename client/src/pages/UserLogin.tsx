@@ -202,9 +202,11 @@ export default function UserLogin() {
             </Button>
             
             <div className="text-center text-sm">
-              <p>Don't have an account? <Link href="/register">
-                <a className="font-medium text-primary hover:text-primary-dark">Create one</a>
-              </Link></p>
+              <p>Don't have an account? <span 
+                onClick={() => navigate("/register")}
+                className="font-medium text-primary hover:text-primary-dark cursor-pointer">
+                Create one
+              </span></p>
             </div>
           </form>
         </Form>

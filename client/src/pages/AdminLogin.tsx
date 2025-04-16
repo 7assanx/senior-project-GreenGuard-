@@ -202,11 +202,12 @@ export default function AdminLogin() {
             </Button>
             
             <div className="text-center text-sm mt-6">
-              <Link href="/">
-                <a className="flex items-center justify-center font-medium text-primary hover:text-primary-dark">
-                  <i className="ri-arrow-left-line mr-1"></i> Back to home page
-                </a>
-              </Link>
+              <div 
+                onClick={() => navigate("/")}
+                className="flex items-center justify-center font-medium text-primary hover:text-primary-dark cursor-pointer"
+              >
+                <i className="ri-arrow-left-line mr-1"></i> Back to home page
+              </div>
             </div>
           </form>
         </Form>
