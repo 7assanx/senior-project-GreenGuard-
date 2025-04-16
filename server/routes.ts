@@ -19,7 +19,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       resave: false,
       saveUninitialized: true,
       cookie: { 
-        secure: process.env.NODE_ENV === "production", 
+        secure: false, // Set to false for development, true in production
+        sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true
       },

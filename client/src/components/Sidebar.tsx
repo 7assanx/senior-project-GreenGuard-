@@ -2,6 +2,8 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { getInitials } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { Application } from "@/lib/types";
 
 type SidebarProps = {
   isAdmin?: boolean;
@@ -9,8 +11,14 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: SidebarProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const [_, navigate] = useLocation();
+  
+  // Fetch user's applications
+  const { data: applications } = useQuery<Application[]>({
+    queryKey: ["/api/applications"],
+    enabled: isAuthenticated && !isAdmin,
+  });
 
   const isActive = (page: string) => {
     return activePage === page;
@@ -87,7 +95,13 @@ export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: S
                     Dashboard
                   </div>
                   <div
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => {
+                      if (applications && applications.length > 0) {
+                        navigate(`/applications/${applications[0].id}`);
+                      } else {
+                        navigate("/dashboard");
+                      }
+                    }}
                     className={cn(
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer",
                       isActive("applications")
