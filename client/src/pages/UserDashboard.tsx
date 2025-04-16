@@ -198,62 +198,56 @@ export default function UserDashboard() {
                   <ul role="list" className="divide-y divide-neutral-200">
                     {applications && applications.length > 0 ? (
                       <>
-                        <li>
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-primary truncate">
-                                AI Feedback Available
-                              </p>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                  New
+                        {applications.slice(0, 3).map((app, index) => (
+                          <li key={app.id}>
+                            <div className="px-4 py-4 sm:px-6">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-primary truncate">
+                                  {app.status === "approved" 
+                                    ? "Application Approved" 
+                                    : app.status === "rejected"
+                                    ? "Application Rejected"
+                                    : app.status === "pending"
+                                    ? "Application Submitted for Review"
+                                    : "Application Updated"}
                                 </p>
+                                <div className="ml-2 flex-shrink-0 flex">
+                                  <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    app.status === "approved" 
+                                      ? "bg-green-100 text-green-800" 
+                                      : app.status === "rejected"
+                                      ? "bg-red-100 text-red-800"
+                                      : app.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-blue-100 text-blue-800"
+                                  }`}>
+                                    {app.status === "approved" 
+                                      ? "Approved" 
+                                      : app.status === "rejected"
+                                      ? "Rejected"
+                                      : app.status === "pending"
+                                      ? "Pending"
+                                      : "In Progress"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="mt-2 sm:flex sm:justify-between">
+                                <div className="sm:flex">
+                                  <p className="flex items-center text-sm text-neutral-500">
+                                    <i className="ri-file-list-3-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
+                                    {app.projectName} ({app.projectType})
+                                  </p>
+                                </div>
+                                <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
+                                  <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
+                                  <p>
+                                    {formatRelativeTime(new Date(app.updatedAt))}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p className="flex items-center text-sm text-neutral-500">
-                                  <i className="ri-file-list-3-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                  Feedback on Energy Efficiency Report
-                                </p>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
-                                <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                <p>
-                                  {formatRelativeTime(new Date(Date.now() - 2 * 60 * 60 * 1000))}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-primary truncate">
-                                Document Received
-                              </p>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-neutral-100 text-neutral-800">
-                                  Processed
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p className="flex items-center text-sm text-neutral-500">
-                                  <i className="ri-file-list-3-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                  Water Management Plan
-                                </p>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
-                                <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                <p>
-                                  {formatRelativeTime(new Date(Date.now() - 24 * 60 * 60 * 1000))}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
+                          </li>
+                        ))}
                       </>
                     ) : (
                       <li>

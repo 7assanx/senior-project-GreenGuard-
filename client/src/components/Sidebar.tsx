@@ -87,7 +87,7 @@ export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: S
                     Dashboard
                   </div>
                   <div
-                    onClick={() => navigate("/applications")}
+                    onClick={() => navigate("/dashboard")}
                     className={cn(
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer",
                       isActive("applications")
