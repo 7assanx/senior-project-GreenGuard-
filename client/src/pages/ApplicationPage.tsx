@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { calculateProgress } from "@/lib/utils";
 
 export default function ApplicationPage() {
   const { user, isAuthenticated } = useAuth();

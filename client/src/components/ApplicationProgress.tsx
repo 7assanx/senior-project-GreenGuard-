@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, calculateProgress } from "@/lib/utils";
 import { Application } from "@/lib/types";
 import { Link } from "wouter";
-import { calculateProgress } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 type ApplicationProgressProps = {
@@ -10,7 +9,7 @@ type ApplicationProgressProps = {
 };
 
 export default function ApplicationProgress({ application }: ApplicationProgressProps) {
-  const progress = application.progress || calculateProgress(application.currentStep);
+  const progress = application.progress || calculateProgress(application.currentStep, application.status);
   
   // Use the application status to determine which steps are complete
   const currentStepMap = {

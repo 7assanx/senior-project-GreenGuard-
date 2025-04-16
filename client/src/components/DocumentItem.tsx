@@ -114,17 +114,35 @@ export default function DocumentItem({
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <div className={cn(
-            "rounded-lg p-2 mr-4",
-            isUploaded ? "bg-primary-light bg-opacity-20" : "bg-neutral-100"
+            "rounded-lg p-2 mr-4 flex items-center justify-center",
+            isUploaded ? "bg-green-100" : "bg-neutral-100",
+            isUploaded && "relative"
           )}>
             <i className={cn(
-              isUploaded ? "text-primary" : "text-neutral-400",
+              isUploaded ? "text-green-600" : "text-neutral-400",
               uploadedDocument ? getFileIcon(uploadedDocument.fileType) : "ri-file-text-line",
               "text-xl"
             )}></i>
+            {isUploaded && (
+              <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                <i className="ri-check-line text-xs"></i>
+              </div>
+            )}
           </div>
           <div>
-            <h4 className="text-sm font-medium text-neutral-900">{requiredDocument.name}</h4>
+            <div className="flex items-center">
+              <h4 className="text-sm font-medium text-neutral-900">{requiredDocument.name}</h4>
+              {isUploaded && (
+                <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">
+                  Complete
+                </span>
+              )}
+              {requiredDocument.required && !isUploaded && (
+                <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800">
+                  Required
+                </span>
+              )}
+            </div>
             <p className="text-sm text-neutral-500 mt-1">
               {requiredDocument.description}
             </p>
@@ -133,16 +151,13 @@ export default function DocumentItem({
         <div className="ml-4 flex-shrink-0 flex items-center">
           {isUploaded ? (
             <>
-              <span className="mr-2 flex items-center text-sm text-green-500 font-medium">
-                <i className="ri-check-line mr-1"></i> Uploaded
-              </span>
               <Button
                 onClick={handleDelete}
                 variant="ghost"
                 size="sm"
-                className="bg-white rounded-md font-medium text-primary hover:text-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                className="bg-white rounded-md font-medium text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                <i className="ri-delete-bin-line"></i>
+                <i className="ri-delete-bin-line mr-1"></i> Remove
               </Button>
             </>
           ) : (
