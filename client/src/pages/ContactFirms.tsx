@@ -41,6 +41,7 @@ export default function ContactFirms() {
       (firm.description && firm.description.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const matchesSpecialization = !selectedSpecialization || 
+      selectedSpecialization === "all" ||
       firm.specialization === selectedSpecialization;
     
     return matchesSearch && matchesSpecialization;
@@ -104,7 +105,7 @@ export default function ContactFirms() {
                         <SelectValue placeholder="All specializations" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All specializations</SelectItem>
+                        <SelectItem value="all">All specializations</SelectItem>
                         {specializations.map((spec) => (
                           <SelectItem key={spec} value={spec}>
                             {spec}

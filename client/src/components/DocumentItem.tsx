@@ -135,8 +135,9 @@ export default function DocumentItem({
               </Button>
             </>
           ) : (
-            <label>
+            <label className="cursor-pointer">
               <input
+                id={`file-upload-${requiredDocument.name}`}
                 type="file"
                 className="hidden"
                 onChange={handleFileChange}
@@ -147,7 +148,7 @@ export default function DocumentItem({
                 size="sm"
                 disabled={isUploading}
                 className="inline-flex items-center px-3 py-1.5 border border-primary text-sm font-medium rounded text-primary bg-white hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                onClick={() => {}}
+                onClick={() => document.getElementById(`file-upload-${requiredDocument.name}`)?.click()}
               >
                 {isUploading ? (
                   <>

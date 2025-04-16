@@ -41,11 +41,12 @@ export default function DashboardStat({
       {linkText && linkHref && (
         <div className="bg-neutral-50 px-5 py-3">
           <div className="text-sm">
-            <Link href={linkHref}>
-              <a className="font-medium text-primary hover:text-primary-dark">
-                {linkText}
-              </a>
-            </Link>
+            <div
+              onClick={() => window.location.href = linkHref}
+              className="font-medium text-primary hover:text-primary-dark cursor-pointer"
+            >
+              {linkText}
+            </div>
           </div>
         </div>
       )}
