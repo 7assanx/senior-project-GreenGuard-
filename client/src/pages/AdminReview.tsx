@@ -23,7 +23,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 
 const certificationSchema = z.object({
   score: z.coerce.number().min(0).max(5),
-  level: z.string().min(1),
+  level: z.string().min(1, { message: "Certification level is required" }),
   feedback: z.string().min(10, { message: "Feedback must be at least 10 characters" }),
   generateCertificate: z.boolean(),
 });
@@ -103,9 +103,10 @@ export default function AdminReview() {
       // Navigate back to admin dashboard
       navigate("/admin/dashboard");
     } catch (error) {
+      console.error("Certification error:", error);
       toast({
         title: "Error",
-        description: "Could not certify application. Please try again.",
+        description: error instanceof Error ? error.message : "Could not certify application. Please try again.",
         variant: "destructive",
       });
     } finally {
