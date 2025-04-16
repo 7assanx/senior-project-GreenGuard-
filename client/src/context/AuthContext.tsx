@@ -53,8 +53,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (username: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/login", { username, password });
-      const userData = await response.json();
+      // Use direct fetch instead of apiRequest to handle error messages better
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Invalid username or password");
+      }
+
+      const userData = await response.clone().json();
       setUser(userData);
       
       // Redirect based on user role
@@ -74,8 +86,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (userData: any) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/register", userData);
-      const user = await response.json();
+      // Use direct fetch instead of apiRequest to handle error messages better
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed. Please try again.");
+      }
+
+      const user = await response.clone().json();
       setUser(user);
       navigate("/dashboard");
     } catch (error) {
