@@ -562,6 +562,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Download certification PDF
+  app.get("/api/applications/:id/certification/download", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application or is admin
+      const user = await storage.getUser((req.session as any).userId);
+      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const certification = await storage.getCertificationByApplicationId(applicationId);
+      
+      if (!certification) {
+        return res.status(404).json({ message: "Certification not found" });
+      }
+      
+      // For demo purposes, we'll generate a simple PDF-like response
+      const userName = user?.name || "User";
+      const projectName = application.projectName;
+      const projectType = application.projectType;
+      const certLevel = certification.level;
+      const score = certification.score;
+      // Format the issue date, defaulting to current date if not available
+      const issueDate = certification.issuedAt instanceof Date 
+        ? certification.issuedAt.toLocaleDateString() 
+        : new Date().toLocaleDateString();
+      
+      // Send certification details as JSON with a flag indicating it's for download
+      res.json({
+        fileName: `${projectName}_certification.pdf`,
+        certificationData: {
+          userName,
+          projectName,
+          projectType,
+          certLevel,
+          score,
+          issueDate,
+          downloadUrl: certification.pdfUrl || "#",
+          isDownloadable: true
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to download certification" });
+    }
+  });
+  
   // ADMIN ROUTES
   
   // Get all applications (admin only)

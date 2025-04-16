@@ -112,13 +112,28 @@ export default function UserDashboard() {
                     linkHref="/applications"
                   />
                   
-                  <DashboardStat
-                    title="Approved"
-                    value={isLoading ? "..." : applications?.filter(a => a.status === "approved").length || 0}
-                    icon="ri-check-double-line"
-                    linkText="View certificates"
-                    linkHref="/applications"
-                  />
+                  {(() => {
+                    // Handle certification data safely with proper null checks
+                    const hasApprovedApps = applications && applications.length > 0 && 
+                      applications.some(a => a.status === "approved");
+                    
+                    const approvedApp = applications && 
+                      applications.find(a => a.status === "approved");
+                    
+                    const certLink = hasApprovedApps && approvedApp 
+                      ? `/api/applications/${approvedApp.id}/certification/download`
+                      : "/applications";
+                    
+                    return (
+                      <DashboardStat
+                        title="Approved"
+                        value={isLoading ? "..." : applications?.filter(a => a.status === "approved").length || 0}
+                        icon="ri-check-double-line"
+                        linkText={hasApprovedApps ? "View certificate" : "View all"}
+                        linkHref={certLink}
+                      />
+                    );
+                  })()}
                 </div>
               </div>
               
