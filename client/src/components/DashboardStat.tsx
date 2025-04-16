@@ -41,14 +41,25 @@ export default function DashboardStat({
       {linkText && linkHref && (
         <div className="bg-neutral-50 px-5 py-3">
           <div className="text-sm">
-            <a
-              href={linkHref}
-              download={linkHref.includes('/download')}
-              target={linkHref.includes('/download') ? "_blank" : "_self"}
-              className="font-medium text-primary hover:text-primary-dark cursor-pointer"
-            >
-              {linkText}
-            </a>
+            {linkHref.includes('/download') ? (
+              // Use regular anchor for download links
+              <a
+                href={linkHref}
+                download
+                target="_blank"
+                className="font-medium text-primary hover:text-primary-dark cursor-pointer"
+              >
+                {linkText}
+              </a>
+            ) : (
+              // Use Link component for navigation within the app
+              <Link
+                href={linkHref}
+                className="font-medium text-primary hover:text-primary-dark cursor-pointer"
+              >
+                {linkText}
+              </Link>
+            )}
           </div>
         </div>
       )}

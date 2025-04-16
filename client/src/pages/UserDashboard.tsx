@@ -101,7 +101,7 @@ export default function UserDashboard() {
                     value={isLoading ? "..." : applications?.length || 0}
                     icon="ri-file-list-3-line"
                     linkText="View all"
-                    linkHref="/applications"
+                    linkHref="/dashboard"
                   />
                   
                   <DashboardStat
@@ -109,7 +109,7 @@ export default function UserDashboard() {
                     value={isLoading ? "..." : applications?.filter(a => a.status === "draft" || a.status === "pending").length || 0}
                     icon="ri-time-line"
                     linkText="View details"
-                    linkHref="/applications"
+                    linkHref={applications && applications.length > 0 ? `/applications/${applications[0].id}` : "/dashboard"}
                   />
                   
                   {(() => {
@@ -122,7 +122,7 @@ export default function UserDashboard() {
                     
                     const certLink = hasApprovedApps && approvedApp 
                       ? `/api/applications/${approvedApp.id}/certification/download`
-                      : "/applications";
+                      : "/dashboard";
                     
                     return (
                       <DashboardStat
