@@ -36,16 +36,24 @@ export default function Home() {
                     platform. Upload documents, get AI feedback, and receive your certification
                     faster than ever.
                   </p>
-                  <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                  <div className="mt-5 sm:mt-8 sm:flex flex-wrap sm:justify-center lg:justify-start gap-3">
                     <div className="rounded-md shadow">
                       <Button
-                        onClick={() => setShowPortalSelect(true)}
+                        onClick={() => navigate("/login")}
                         className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark md:py-4 md:text-lg md:px-10"
                       >
-                        Get started
+                        <i className="ri-user-line mr-2"></i> User Login
                       </Button>
                     </div>
-                    <div className="mt-3 sm:mt-0 sm:ml-3">
+                    <div className="rounded-md shadow mt-3 sm:mt-0">
+                      <Button
+                        onClick={() => navigate("/admin/login")}
+                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-700 hover:bg-green-800 md:py-4 md:text-lg md:px-10"
+                      >
+                        <i className="ri-admin-line mr-2"></i> Admin Login
+                      </Button>
+                    </div>
+                    <div className="mt-3 sm:mt-0">
                       <Button
                         variant="outline"
                         onClick={() => navigate("/about")}

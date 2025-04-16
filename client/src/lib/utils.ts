@@ -107,14 +107,29 @@ export function getPearlRatingLabel(rating: number): string {
   return "5 Pearl";
 }
 
-// Mock file upload handler (in a real app, this would upload to a server)
+// File upload handler using base64 encoding
 export async function uploadFile(file: File): Promise<string> {
-  return new Promise((resolve) => {
-    // Simulate network delay
-    setTimeout(() => {
-      // Generate a mock file URL
-      const mockFileUrl = `https://storage.example.com/files/${file.name}`;
-      resolve(mockFileUrl);
-    }, 1000);
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = () => {
+      try {
+        // This creates a data URL (base64 encoded) for the file
+        const base64String = reader.result as string;
+        
+        // In a real production app, you would upload to a storage service 
+        // For this demo, we'll use the base64 string directly as the URL
+        resolve(base64String);
+      } catch (error) {
+        reject(new Error("Failed to process file"));
+      }
+    };
+    
+    reader.onerror = () => {
+      reject(new Error("Failed to read file"));
+    };
+    
+    // Read the file as a data URL (base64)
+    reader.readAsDataURL(file);
   });
 }
