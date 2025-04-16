@@ -17,8 +17,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     session({
       secret: "green-guard-secret",
       resave: false,
-      saveUninitialized: false,
-      cookie: { secure: process.env.NODE_ENV === "production", maxAge: 24 * 60 * 60 * 1000 },
+      saveUninitialized: true,
+      cookie: { 
+        secure: process.env.NODE_ENV === "production", 
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        httpOnly: true
+      },
       store: new MemoryStoreSession({
         checkPeriod: 86400000, // prune expired entries every 24h
       }),
