@@ -41,12 +41,14 @@ export default function DashboardStat({
       {linkText && linkHref && (
         <div className="bg-neutral-50 px-5 py-3">
           <div className="text-sm">
-            <div
-              onClick={() => window.location.href = linkHref}
+            <a
+              href={linkHref}
+              download={linkHref.includes('/download')}
+              target={linkHref.includes('/download') ? "_blank" : "_self"}
               className="font-medium text-primary hover:text-primary-dark cursor-pointer"
             >
               {linkText}
-            </div>
+            </a>
           </div>
         </div>
       )}
