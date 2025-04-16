@@ -162,24 +162,41 @@ export default function ApplicationCard({
             </div>
         </div>
         
-        {/* Admin Action Buttons (for pending applications) */}
-        {isAdmin && application.status === "pending" && (
+        {/* Admin Action Buttons (for all applications) */}
+        {isAdmin && (
           <div className="px-4 py-3 sm:px-6 border-t border-neutral-200 bg-neutral-50 flex justify-end space-x-3">
             <Button
               size="sm"
               variant="outline"
-              className="text-red-600 border-red-600 hover:bg-red-50"
-              onClick={handleReject}
+              className="border-primary text-primary hover:bg-primary-50"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate(`/admin/review/${application.id}`);
+              }}
             >
-              <i className="ri-close-circle-line mr-1"></i> Reject
+              <i className="ri-search-line mr-1"></i> Review
             </Button>
-            <Button
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white"
-              onClick={handleApprove}
-            >
-              <i className="ri-check-line mr-1"></i> Approve
-            </Button>
+            
+            {application.status === "pending" && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-red-600 border-red-600 hover:bg-red-50"
+                  onClick={handleReject}
+                >
+                  <i className="ri-close-circle-line mr-1"></i> Reject
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleApprove}
+                >
+                  <i className="ri-check-line mr-1"></i> Approve
+                </Button>
+              </>
+            )}
           </div>
         )}
       </div>
