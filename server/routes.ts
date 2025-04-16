@@ -409,24 +409,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const applicationId = parseInt(req.params.id);
       const application = await storage.getApplication(applicationId);
+      const documentIds = req.body.documentIds || []; // Accept specific document IDs
       
       if (!application) {
         return res.status(404).json({ message: "Application not found" });
       }
       
-      // Check if user owns the application
-      if (application.userId !== (req.session as any).userId) {
+      // Check if user owns the application or is admin
+      const isAdmin = (req.session as any).userRole === 'admin';
+      if (!isAdmin && application.userId !== (req.session as any).userId) {
         return res.status(403).json({ message: "Forbidden" });
       }
       
       // Get the documents for this application
-      const documents = await storage.getDocumentsByApplicationId(applicationId);
+      let documents = await storage.getDocumentsByApplicationId(applicationId);
       
       if (!documents || documents.length === 0) {
         return res.status(400).json({ 
           message: "No documents found for analysis", 
           status: "error" 
         });
+      }
+      
+      // Filter documents if specific IDs were provided
+      if (documentIds.length > 0) {
+        documents = documents.filter(doc => documentIds.includes(doc.id));
+        if (documents.length === 0) {
+          return res.status(400).json({
+            message: "Specified documents not found",
+            status: "error"
+          });
+        }
       }
       
       // Import the OpenAI analysis functions

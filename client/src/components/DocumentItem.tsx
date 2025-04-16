@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Document, RequiredDocument } from "@/lib/types";
+import { Document, RequiredDocument, AIFeedbackResponse } from "@/lib/types";
 import { getFileIcon } from "@/components/ui/ui-utils";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -7,6 +7,13 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { uploadFile } from "@/lib/utils";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from "@/components/ui/dialog";
 
 type DocumentItemProps = {
   requiredDocument: RequiredDocument;
@@ -24,6 +31,13 @@ export default function DocumentItem({
   onDelete,
 }: DocumentItemProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    strengths: string[];
+    weaknesses: string[];
+    recommendation: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +121,62 @@ export default function DocumentItem({
     }
   };
 
+  const getAIFeedback = async () => {
+    if (!uploadedDocument) return;
+    
+    setIsAnalyzing(true);
+    try {
+      // Call the server-side endpoint to get AI feedback for just this document
+      const response = await apiRequest("POST", `/api/applications/${applicationId}/feedback`, {
+        documentIds: [uploadedDocument.id]
+      });
+      
+      const data = await response.json() as AIFeedbackResponse;
+      
+      if (data.status === "success" && data.feedback && data.feedback.length > 0) {
+        const docFeedback = data.feedback[0];
+        setFeedback({
+          strengths: docFeedback.strengths,
+          weaknesses: docFeedback.weaknesses,
+          recommendation: docFeedback.recommendation
+        });
+        
+        // Open the dialog to show feedback
+        setDialogOpen(true);
+        
+        // Also update the document's feedback in the database
+        await apiRequest("PATCH", `/api/documents/${uploadedDocument.id}`, {
+          feedback: {
+            strengths: docFeedback.strengths,
+            weaknesses: docFeedback.weaknesses,
+            recommendation: docFeedback.recommendation
+          },
+          status: "reviewed"
+        });
+        
+        // Invalidate queries to refresh the data
+        queryClient.invalidateQueries({ queryKey: [`/api/applications/${applicationId}/documents`] });
+      } else {
+        toast({
+          title: "No feedback generated",
+          description: "Unable to generate AI feedback for this document.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error getting AI feedback:", error);
+      toast({
+        title: "Failed to get feedback",
+        description: error instanceof Error ? error.message : "There was an error generating AI feedback. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const isUploaded = !!uploadedDocument;
+  const hasFeedback = uploadedDocument?.feedback !== undefined;
   
   return (
     <li className="py-4">
@@ -148,9 +217,33 @@ export default function DocumentItem({
             </p>
           </div>
         </div>
-        <div className="ml-4 flex-shrink-0 flex items-center">
+        <div className="ml-4 flex-shrink-0 flex items-center space-x-2">
           {isUploaded ? (
             <>
+              {/* AI Analysis button */}
+              <Button
+                onClick={getAIFeedback}
+                variant="default"
+                size="sm"
+                disabled={isAnalyzing}
+                className={cn(
+                  "inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded shadow-sm text-white",
+                  isAnalyzing ? "bg-primary-light" : "bg-primary hover:bg-primary-dark",
+                  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                )}
+              >
+                {isAnalyzing ? (
+                  <>
+                    <i className="ri-loader-2-line animate-spin mr-1"></i> Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-robot-line mr-1"></i> Get AI
+                  </>
+                )}
+              </Button>
+              
+              {/* Delete button */}
               <Button
                 onClick={handleDelete}
                 variant="ghost"
@@ -190,6 +283,70 @@ export default function DocumentItem({
           )}
         </div>
       </div>
+      
+      {/* Feedback Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>AI Feedback: {requiredDocument.name}</DialogTitle>
+            <DialogDescription>
+              Our AI has analyzed your document and provided the following feedback to help improve your submission.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 space-y-4">
+            {feedback ? (
+              <>
+                {/* Strengths */}
+                <div>
+                  <h4 className="text-sm font-medium text-green-700 mb-2 flex items-center">
+                    <i className="ri-check-line mr-1"></i> Strengths
+                  </h4>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {feedback.strengths.map((strength, idx) => (
+                      <li key={idx} className="text-sm text-neutral-700">{strength}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Weaknesses */}
+                <div>
+                  <h4 className="text-sm font-medium text-red-700 mb-2 flex items-center">
+                    <i className="ri-error-warning-line mr-1"></i> Areas for Improvement
+                  </h4>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {feedback.weaknesses.map((weakness, idx) => (
+                      <li key={idx} className="text-sm text-neutral-700">{weakness}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Recommendation */}
+                <div>
+                  <h4 className="text-sm font-medium text-blue-700 mb-2 flex items-center">
+                    <i className="ri-lightbulb-line mr-1"></i> Recommendations
+                  </h4>
+                  <p className="text-sm text-neutral-700">{feedback.recommendation}</p>
+                </div>
+              </>
+            ) : (
+              <div className="py-4 text-center">
+                <p className="text-neutral-500">No feedback available</p>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-4 flex justify-end">
+            <Button
+              onClick={() => setDialogOpen(false)}
+              variant="outline"
+              size="sm"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }

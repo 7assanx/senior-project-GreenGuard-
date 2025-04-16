@@ -137,8 +137,27 @@ export default function UserDashboard() {
                 </div>
               </div>
               
+              {/* Action Button Row */}
+              <div className="mt-6 flex justify-end">
+                <Button
+                  onClick={handleCreateApplication}
+                  disabled={isCreatingApplication}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                >
+                  {isCreatingApplication ? (
+                    <>
+                      <i className="ri-loader-2-line animate-spin mr-2"></i> Creating...
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-add-line mr-2"></i> Create New Application
+                    </>
+                  )}
+                </Button>
+              </div>
+              
               {/* Application Progress */}
-              <div className="mt-8">
+              <div className="mt-4">
                 {isLoading ? (
                   <div className="flex justify-center items-center h-48">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -163,21 +182,6 @@ export default function UserDashboard() {
                       <p className="text-neutral-500 mb-4">
                         You don't have any active applications. Start your certification process by creating a new application.
                       </p>
-                      <Button
-                        onClick={handleCreateApplication}
-                        disabled={isCreatingApplication}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                      >
-                        {isCreatingApplication ? (
-                          <>
-                            <i className="ri-loader-2-line animate-spin mr-2"></i> Creating...
-                          </>
-                        ) : (
-                          <>
-                            <i className="ri-add-line mr-2"></i> Create New Application
-                          </>
-                        )}
-                      </Button>
                     </CardContent>
                   </Card>
                 )}
