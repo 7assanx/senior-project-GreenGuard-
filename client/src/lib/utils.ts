@@ -83,14 +83,44 @@ export function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-export function calculateProgress(currentStep: string): number {
+/**
+ * Calculate the application progress percentage based on current step and application status
+ * @param currentStep - The current step of the application
+ * @param status - Optional application status
+ * @param docsUploaded - Optional number of uploaded documents
+ * @param totalDocs - Optional total number of required documents
+ */
+export function calculateProgress(
+  currentStep: string,
+  status?: string,
+  docsUploaded?: number,
+  totalDocs?: number
+): number {
+  // If status is not draft, the application is complete
+  if (status && status !== "draft") {
+    return 100;
+  }
+  
+  // If we have document upload info, use it to calculate more precise progress
+  if (typeof docsUploaded === 'number' && typeof totalDocs === 'number' && totalDocs > 0) {
+    const uploadPercentage = Math.min(100, Math.round((docsUploaded / totalDocs) * 100));
+    
+    // Blend the upload percentage with the step-based progress
+    if (currentStep === "upload") {
+      return Math.max(25, Math.min(75, uploadPercentage));
+    } else if (currentStep === "feedback") {
+      return Math.max(75, uploadPercentage);
+    }
+  }
+  
+  // Default step-based progress calculation
   switch (currentStep) {
     case "requirements":
-      return 10;
+      return 25;
     case "upload":
-      return 40;
+      return 50;
     case "feedback":
-      return 70;
+      return 75;
     case "submitted":
       return 100;
     default:

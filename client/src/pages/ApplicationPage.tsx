@@ -81,7 +81,27 @@ export default function ApplicationPage() {
   const uploadedDocumentNames = documents?.map(doc => doc.name) || [];
   const documentsUploaded = documents?.length || 0;
   const totalRequiredDocuments = requiredDocuments.length;
-  const progress = Math.round((documentsUploaded / totalRequiredDocuments) * 100);
+  
+  // Calculate progress using our enhanced function that considers documents and application status
+  const progress = calculateProgress(
+    application?.currentStep || "requirements",
+    application?.status,
+    documentsUploaded,
+    totalRequiredDocuments
+  );
+  
+  // Update the application with the calculated progress (if needed)
+  useEffect(() => {
+    // Only update if the application exists, is in draft status, and the progress differs
+    if (application && application.status === "draft" && application.progress !== progress) {
+      // Update progress on the server
+      try {
+        apiRequest("PATCH", `/api/applications/${applicationId}`, { progress });
+      } catch (error) {
+        console.error("Failed to update progress:", error);
+      }
+    }
+  }, [application, progress, applicationId]);
   
   // Determine if all required documents are uploaded to enable submission
   const requiredDocsUploaded = requiredDocuments

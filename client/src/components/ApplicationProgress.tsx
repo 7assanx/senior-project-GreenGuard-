@@ -12,13 +12,34 @@ type ApplicationProgressProps = {
 export default function ApplicationProgress({ application }: ApplicationProgressProps) {
   const progress = application.progress || calculateProgress(application.currentStep);
   
+  // Use the application status to determine which steps are complete
+  const currentStepMap = {
+    "requirements": 0,
+    "upload": 1,
+    "feedback": 2,
+    "submitted": 3
+  };
+  
+  const statusMap = {
+    "draft": "upload",
+    "pending": "submitted",
+    "in_progress": "submitted",
+    "approved": "submitted",
+    "rejected": "submitted"
+  };
+  
+  // Get the current step index based on application status and currentStep
+  const currentStepIndex = application.status !== "draft" 
+    ? 3  // If not draft, we've completed all steps
+    : currentStepMap[application.currentStep] || 0;
+  
   const steps = [
     { 
       id: "requirements", 
       label: "Document Requirements", 
       description: "Review all required documents",
       icon: "ri-check-line",
-      isCompleted: progress >= 10,
+      isCompleted: currentStepIndex > 0 || application.progress >= 25,
       isActive: application.currentStep === "requirements"
     },
     { 
@@ -26,7 +47,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "Upload Documents", 
       description: "Upload the required files",
       icon: "ri-file-upload-line",
-      isCompleted: progress >= 40,
+      isCompleted: currentStepIndex > 1 || application.progress >= 50,
       isActive: application.currentStep === "upload"
     },
     { 
@@ -34,7 +55,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "AI Feedback", 
       description: "Get AI analysis of your documents",
       icon: "ri-robot-line",
-      isCompleted: progress >= 70,
+      isCompleted: currentStepIndex > 2 || application.progress >= 75 || application.status !== "draft",
       isActive: application.currentStep === "feedback"
     },
     { 
@@ -42,7 +63,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "Submit Application", 
       description: "Final review and submission",
       icon: "ri-send-plane-line",
-      isCompleted: progress >= 100,
+      isCompleted: application.status !== "draft" || application.progress >= 100,
       isActive: application.currentStep === "submitted"
     }
   ];
