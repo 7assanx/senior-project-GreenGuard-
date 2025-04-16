@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import logoImage from "../assets/logo.png";
 
 type MobileHeaderProps = {
   isAdmin?: boolean;
@@ -38,7 +39,7 @@ export default function MobileHeader({ isAdmin = false, title, activePage = "das
           <i className="ri-menu-line text-2xl"></i>
         </button>
         <div className="flex items-center pr-2">
-          <img src="/src/assets/logo.png" alt="Green Guard Logo" className="h-8 w-auto mr-1" />
+          <img src={logoImage} alt="Green Guard Logo" className="h-8 w-auto mr-1" />
           <span className="font-bold text-lg text-primary-dark sr-only">{title}</span>
         </div>
       </div>
@@ -68,7 +69,7 @@ export default function MobileHeader({ isAdmin = false, title, activePage = "das
             <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
               <div className="flex-shrink-0 flex items-center px-4">
                 <div className="flex items-center">
-                  <img src="/src/assets/logo.png" alt="Green Guard Logo" className="h-10 w-auto" />
+                  <img src={logoImage} alt="Green Guard Logo" className="h-10 w-auto" />
                 </div>
               </div>
               <nav className="mt-5 px-2 space-y-1">

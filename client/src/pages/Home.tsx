@@ -3,6 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 import PortalSelection from "@/components/PortalSelection";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import logoImage from "../assets/logo.png";
 
 export default function Home() {
   const [showPortalSelect, setShowPortalSelect] = useState(false);
@@ -28,7 +29,7 @@ export default function Home() {
               <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 xl:mt-28">
                 <div className="text-center lg:text-left">
                   <div className="flex justify-center lg:justify-start mb-6">
-                    <img src="/src/assets/logo.png" alt="Green Guard Logo" className="h-24 w-auto" />
+                    <img src={logoImage} alt="Green Guard Logo" className="h-24 w-auto" />
                   </div>
                   <h1 className="text-4xl font-extrabold text-neutral-900 sm:text-5xl md:text-6xl">
                     <span className="block">Smart AI-Powered</span>

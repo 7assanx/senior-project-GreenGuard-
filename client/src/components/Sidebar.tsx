@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getInitials } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Application } from "@/lib/types";
+import logoImage from "../assets/logo.png";
 
 type SidebarProps = {
   isAdmin?: boolean;
@@ -35,7 +36,7 @@ export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: S
         <div className="flex flex-col h-0 flex-1 bg-green-800">
           <div className="flex items-center h-16 flex-shrink-0 px-4 bg-green-700">
             <div className="flex items-center">
-              <img src="/src/assets/logo.png" alt="Green Guard Logo" className="h-10 w-auto mr-1" />
+              <img src={logoImage} alt="Green Guard Logo" className="h-10 w-auto mr-1" />
             </div>
           </div>
           <div className="flex-1 flex flex-col overflow-y-auto">
