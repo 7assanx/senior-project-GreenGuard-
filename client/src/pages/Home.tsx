@@ -27,6 +27,9 @@ export default function Home() {
             <div className="pt-10 sm:pt-16 lg:pt-8 xl:pt-16">
               <div className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 xl:mt-28">
                 <div className="text-center lg:text-left">
+                  <div className="flex justify-center lg:justify-start mb-6">
+                    <img src="/src/assets/logo.png" alt="Green Guard Logo" className="h-24 w-auto" />
+                  </div>
                   <h1 className="text-4xl font-extrabold text-neutral-900 sm:text-5xl md:text-6xl">
                     <span className="block">Smart AI-Powered</span>
                     <span className="block text-primary">Certification Platform</span>

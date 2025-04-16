@@ -35,8 +35,7 @@ export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: S
         <div className="flex flex-col h-0 flex-1 bg-green-800">
           <div className="flex items-center h-16 flex-shrink-0 px-4 bg-green-700">
             <div className="flex items-center">
-              <i className="ri-shield-check-line text-white text-2xl mr-2"></i>
-              <span className="font-bold text-xl text-white">Green Guard</span>
+              <img src="/src/assets/logo.png" alt="Green Guard Logo" className="h-10 w-auto mr-1" />
             </div>
           </div>
           <div className="flex-1 flex flex-col overflow-y-auto">
