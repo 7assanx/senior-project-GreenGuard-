@@ -16,6 +16,8 @@ import UserDashboard from "@/pages/UserDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import ApplicationPage from "@/pages/ApplicationPage";
 import AdminReview from "@/pages/AdminReview";
+import AdminApplications from "@/pages/AdminApplications";
+import AdminReports from "@/pages/AdminReports";
 import ContactFirms from "@/pages/ContactFirms";
 import Settings from "@/pages/Settings";
 
@@ -31,7 +33,9 @@ function Router() {
       <Route path="/dashboard" component={UserDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/applications/:id" component={ApplicationPage} />
+      <Route path="/admin/applications" component={AdminApplications} />
       <Route path="/admin/applications/:id" component={AdminReview} />
+      <Route path="/admin/reports" component={AdminReports} />
       <Route path="/contact-firms" component={ContactFirms} />
       <Route path="/settings" component={Settings} />
       <Route component={NotFound} />

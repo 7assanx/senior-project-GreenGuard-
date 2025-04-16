@@ -71,7 +71,7 @@ export default function AdminDashboard() {
                     value={isLoading ? "..." : pendingApplications.length}
                     icon="ri-time-line"
                     linkText="View all"
-                    linkHref="/admin/applications"
+                    linkHref="/admin/applications?status=pending"
                   />
                   
                   <DashboardStat
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
                     value={isLoading ? "..." : inProgressApplications.length}
                     icon="ri-loader-4-line"
                     linkText="View details"
-                    linkHref="/admin/applications"
+                    linkHref="/admin/applications?status=in_progress"
                   />
                   
                   <DashboardStat
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
                     value={isLoading ? "..." : approvedApplications.length}
                     icon="ri-check-double-line"
                     linkText="View all"
-                    linkHref="/admin/applications"
+                    linkHref="/admin/applications?status=approved"
                   />
                   
                   <DashboardStat
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
                     icon="ri-close-circle-line"
                     color="text-red-500"
                     linkText="View all"
-                    linkHref="/admin/applications"
+                    linkHref="/admin/applications?status=rejected"
                   />
                 </div>
               </div>
