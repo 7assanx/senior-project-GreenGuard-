@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import PortalSelection from "@/components/PortalSelection";
 import { useLocation } from "wouter";
@@ -10,39 +10,7 @@ import logoImage from "../assets/logo.png";
 
 export default function Home() {
   const [showPortalSelect, setShowPortalSelect] = useState(false);
-  const [activeTab, setActiveTab] = useState("all");
-  const [animateNumbers, setAnimateNumbers] = useState(false);
-  const [counts, setCounts] = useState({ projects: 0, users: 0, certifications: 0 });
   const [_, navigate] = useLocation();
-
-  // Animation for statistics
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimateNumbers(true);
-      
-      const intervalId = setInterval(() => {
-        setCounts(prev => {
-          const newProjects = prev.projects + (prev.projects < 250 ? 5 : 0);
-          const newUsers = prev.users + (prev.users < 500 ? 10 : 0);
-          const newCerts = prev.certifications + (prev.certifications < 150 ? 3 : 0);
-          
-          if (newProjects >= 250 && newUsers >= 500 && newCerts >= 150) {
-            clearInterval(intervalId);
-          }
-          
-          return {
-            projects: Math.min(newProjects, 250),
-            users: Math.min(newUsers, 500),
-            certifications: Math.min(newCerts, 150)
-          };
-        });
-      }, 50);
-      
-      return () => clearInterval(intervalId);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <MainLayout>
@@ -113,64 +81,6 @@ export default function Home() {
             src="https://images.unsplash.com/photo-1572120360610-d971b9d7767c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
             alt="Sustainable green building with solar panels"
           />
-        </div>
-      </div>
-
-      {/* Statistics Section */}
-      <div className="bg-green-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-10">
-            <h2 className="text-base text-primary font-semibold tracking-wide uppercase">
-              Impact
-            </h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
-              Making a Difference Together
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Stat Card 1 */}
-            <Card className="border-green-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-2xl text-center text-primary-dark">
-                  <i className="ri-building-4-line mr-2 text-3xl"></i>
-                  Projects
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center pt-0">
-                <p className="text-5xl font-bold text-primary">{animateNumbers ? counts.projects : 0}+</p>
-                <p className="text-neutral-500 mt-2">Sustainable projects registered</p>
-              </CardContent>
-            </Card>
-            
-            {/* Stat Card 2 */}
-            <Card className="border-green-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-2xl text-center text-primary-dark">
-                  <i className="ri-user-3-line mr-2 text-3xl"></i>
-                  Users
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center pt-0">
-                <p className="text-5xl font-bold text-primary">{animateNumbers ? counts.users : 0}+</p>
-                <p className="text-neutral-500 mt-2">Active platform users</p>
-              </CardContent>
-            </Card>
-            
-            {/* Stat Card 3 */}
-            <Card className="border-green-200 hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-2xl text-center text-primary-dark">
-                  <i className="ri-award-line mr-2 text-3xl"></i>
-                  Certifications
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center pt-0">
-                <p className="text-5xl font-bold text-primary">{animateNumbers ? counts.certifications : 0}+</p>
-                <p className="text-neutral-500 mt-2">Pearl certifications awarded</p>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
 
