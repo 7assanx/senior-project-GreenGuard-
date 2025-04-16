@@ -89,11 +89,13 @@ export default function ApplicationProgress({ application }: ApplicationProgress
           <div className="w-full bg-neutral-200 rounded-full h-2.5">
             <div 
               className="bg-primary h-2.5 rounded-full" 
-              style={{ width: `${progress}%` }}
+              style={{ width: `${application.status === "pending" || application.status === "in_progress" || application.status === "approved" ? 100 : progress}%` }}
             ></div>
           </div>
           <div className="flex justify-between mt-1">
-            <span className="text-sm text-neutral-500">{progress}% Complete</span>
+            <span className="text-sm text-neutral-500">
+              {application.status === "pending" || application.status === "in_progress" || application.status === "approved" ? "100" : progress}% Complete
+            </span>
             <span className="text-sm text-neutral-500">
               Status: {application.status === "draft" ? "Document Collection" : 
                       application.status === "pending" ? "Under Review" :
