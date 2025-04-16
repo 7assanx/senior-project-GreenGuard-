@@ -264,8 +264,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
+      // Create a custom validation schema without requiring applicationId in body
+      const uploadDocumentSchema = z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        fileUrl: z.string(),
+        fileType: z.string(),
+        status: z.string().default("pending"),
+        feedback: z.any().optional()
+      });
+      
       const documentData = {
-        ...insertDocumentSchema.parse(req.body),
+        ...uploadDocumentSchema.parse(req.body),
         applicationId
       };
       
