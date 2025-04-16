@@ -158,18 +158,6 @@ export default function ApplicationPage() {
               </div>
             ) : (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                {/* Progress bar for current step */}
-                <div className="mt-6">
-                  <div className="flex items-center justify-between text-sm font-medium mb-1">
-                    <span>Document Upload</span>
-                    <span>{documentsUploaded}/{totalRequiredDocuments} Complete</span>
-                  </div>
-                  <Progress
-                    value={progress}
-                    className="w-full bg-neutral-200 rounded-full h-2.5"
-                  />
-                </div>
-
                 {/* Document upload section */}
                 <div className="mt-6">
                   <div className="bg-white shadow overflow-hidden sm:rounded-md">
