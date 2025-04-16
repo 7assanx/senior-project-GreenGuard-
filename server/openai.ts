@@ -1,11 +1,8 @@
-import { AIFeedbackResponse, Document } from './types';
 import OpenAI from "openai";
-import { apiRequest } from './queryClient';
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || '', // Frontend env var
-  dangerouslyAllowBrowser: true // Only for frontend use
+  apiKey: process.env.OPENAI_API_KEY || ''
 });
 
 /**
@@ -46,71 +43,9 @@ export async function analyzeDocument(document: { name: string, content: string 
 }
 
 /**
- * Gets AI feedback for documents in an application
+ * Gets simulated document content for testing purposes
  */
-export async function getAIFeedback(
-  applicationId: number,
-  documentIds: number[] = []
-): Promise<AIFeedbackResponse> {
-  try {
-    // First, fetch the actual documents from the API
-    const response = await apiRequest('GET', `/api/applications/${applicationId}/documents`);
-    const documents = await response.json() as Document[];
-    
-    // If specific document IDs are provided, filter to only those
-    const docsToAnalyze = documentIds.length > 0 
-      ? documents.filter((doc: Document) => documentIds.includes(doc.id))
-      : documents;
-    
-    // Process each document with OpenAI
-    const feedbackPromises = docsToAnalyze.map(async (doc: Document) => {
-      try {
-        // In a real app, we would fetch the document content here
-        // For this demo, we'll simulate document content based on name
-        const simulatedContent = getSimulatedDocumentContent(doc.name);
-        
-        const analysis = await analyzeDocument({
-          name: doc.name,
-          content: simulatedContent
-        });
-        
-        return {
-          documentName: doc.name,
-          strengths: analysis.strengths,
-          weaknesses: analysis.weaknesses,
-          recommendation: analysis.recommendation
-        };
-      } catch (error) {
-        console.error(`Error analyzing document ${doc.name}:`, error);
-        return {
-          documentName: doc.name,
-          strengths: ["Document processed successfully"],
-          weaknesses: ["Unable to perform detailed analysis"],
-          recommendation: "Please ensure document follows Estidama guidelines for proper analysis."
-        };
-      }
-    });
-    
-    const feedbackResults = await Promise.all(feedbackPromises);
-    
-    return {
-      status: "success",
-      feedback: feedbackResults
-    };
-  } catch (error) {
-    console.error("Error getting AI feedback:", error);
-    return {
-      status: "error",
-      feedback: []
-    };
-  }
-}
-
-/**
- * Simulates document content for demonstration purposes
- * In a real app, this would be replaced with actual document content from files
- */
-function getSimulatedDocumentContent(documentName: string): string {
+export function getSimulatedDocumentContent(documentName: string): string {
   switch(documentName) {
     case "Energy Efficiency Report":
       return `

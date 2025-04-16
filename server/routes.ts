@@ -343,24 +343,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      // This would normally call the OpenAI API, but we'll mock it for now
-      const mockFeedback = {
-        status: "success",
-        feedback: [
-          {
-            documentName: "Energy Efficiency Report",
-            strengths: [
-              "Good coverage of baseline energy consumption data",
-              "Excellent passive design strategies for reducing cooling loads"
-            ],
-            weaknesses: [
-              "Missing detailed HVAC system specifications and efficiency ratings",
-              "Renewable energy integration section needs expansion"
-            ],
-            recommendation: "Add the missing HVAC specifications and expand the renewable energy section before final submission."
-          }
-        ]
-      };
+      // Get the documents for this application
+      const documents = await storage.getDocumentsByApplicationId(applicationId);
+      
+      if (!documents || documents.length === 0) {
+        return res.status(400).json({ 
+          message: "No documents found for analysis", 
+          status: "error" 
+        });
+      }
+      
+      // Import the OpenAI analysis functions
+      const { analyzeDocument, getSimulatedDocumentContent } = await import('./openai');
+      
+      // Process each document with OpenAI
+      const feedbackPromises = documents.map(async (doc) => {
+        try {
+          // In a real app, we would fetch the document content here
+          // For this demo, we'll simulate document content based on name
+          const simulatedContent = getSimulatedDocumentContent(doc.name);
+          
+          const analysis = await analyzeDocument({
+            name: doc.name,
+            content: simulatedContent
+          });
+          
+          return {
+            documentName: doc.name,
+            strengths: analysis.strengths,
+            weaknesses: analysis.weaknesses,
+            recommendation: analysis.recommendation
+          };
+        } catch (error) {
+          console.error(`Error analyzing document ${doc.name}:`, error);
+          return {
+            documentName: doc.name,
+            strengths: ["Document processed"],
+            weaknesses: ["Unable to perform detailed analysis with AI at this time"],
+            recommendation: "Please ensure document follows Estidama guidelines for proper analysis."
+          };
+        }
+      });
+      
+      const feedbackResults = await Promise.all(feedbackPromises);
+      
+      // Update document feedback in storage
+      for (const feedback of feedbackResults) {
+        const document = documents.find(d => d.name === feedback.documentName);
+        if (document) {
+          await storage.updateDocument(document.id, {
+            feedback: {
+              strengths: feedback.strengths,
+              weaknesses: feedback.weaknesses,
+              recommendation: feedback.recommendation
+            },
+            status: "reviewed"
+          });
+        }
+      }
       
       // Update application status
       await storage.updateApplication(applicationId, {
@@ -368,9 +408,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updatedAt: new Date()
       });
       
-      res.json(mockFeedback);
+      res.json({
+        status: "success",
+        feedback: feedbackResults
+      });
     } catch (error) {
-      res.status(500).json({ message: "Failed to get feedback" });
+      console.error("AI Feedback error:", error);
+      res.status(500).json({ 
+        message: "Failed to get feedback", 
+        status: "error",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
   
