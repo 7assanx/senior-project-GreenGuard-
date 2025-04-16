@@ -1,13 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import PortalSelection from "@/components/PortalSelection";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import logoImage from "../assets/logo.png";
 
 export default function Home() {
   const [showPortalSelect, setShowPortalSelect] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
+  const [animateNumbers, setAnimateNumbers] = useState(false);
+  const [counts, setCounts] = useState({ projects: 0, users: 0, certifications: 0 });
   const [_, navigate] = useLocation();
+
+  // Animation for statistics
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimateNumbers(true);
+      
+      const intervalId = setInterval(() => {
+        setCounts(prev => {
+          const newProjects = prev.projects + (prev.projects < 250 ? 5 : 0);
+          const newUsers = prev.users + (prev.users < 500 ? 10 : 0);
+          const newCerts = prev.certifications + (prev.certifications < 150 ? 3 : 0);
+          
+          if (newProjects >= 250 && newUsers >= 500 && newCerts >= 150) {
+            clearInterval(intervalId);
+          }
+          
+          return {
+            projects: Math.min(newProjects, 250),
+            users: Math.min(newUsers, 500),
+            certifications: Math.min(newCerts, 150)
+          };
+        });
+      }, 50);
+      
+      return () => clearInterval(intervalId);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <MainLayout>
@@ -81,8 +116,178 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Statistics Section */}
+      <div className="bg-green-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center mb-10">
+            <h2 className="text-base text-primary font-semibold tracking-wide uppercase">
+              Impact
+            </h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
+              Making a Difference Together
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Stat Card 1 */}
+            <Card className="border-green-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-2xl text-center text-primary-dark">
+                  <i className="ri-building-4-line mr-2 text-3xl"></i>
+                  Projects
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center pt-0">
+                <p className="text-5xl font-bold text-primary">{animateNumbers ? counts.projects : 0}+</p>
+                <p className="text-neutral-500 mt-2">Sustainable projects registered</p>
+              </CardContent>
+            </Card>
+            
+            {/* Stat Card 2 */}
+            <Card className="border-green-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-2xl text-center text-primary-dark">
+                  <i className="ri-user-3-line mr-2 text-3xl"></i>
+                  Users
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center pt-0">
+                <p className="text-5xl font-bold text-primary">{animateNumbers ? counts.users : 0}+</p>
+                <p className="text-neutral-500 mt-2">Active platform users</p>
+              </CardContent>
+            </Card>
+            
+            {/* Stat Card 3 */}
+            <Card className="border-green-200 hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-2xl text-center text-primary-dark">
+                  <i className="ri-award-line mr-2 text-3xl"></i>
+                  Certifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center pt-0">
+                <p className="text-5xl font-bold text-primary">{animateNumbers ? counts.certifications : 0}+</p>
+                <p className="text-neutral-500 mt-2">Pearl certifications awarded</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Project Types */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center mb-10">
+            <h2 className="text-base text-primary font-semibold tracking-wide uppercase">
+              Certification Types
+            </h2>
+            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-neutral-900 sm:text-4xl">
+              Estidama Pearl Rating System
+            </p>
+            <p className="mt-4 max-w-2xl text-xl text-neutral-500 lg:mx-auto">
+              Green Guard supports all Estidama Pearl Rating System certification categories.
+            </p>
+          </div>
+
+          <Tabs defaultValue="buildings" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="buildings">Buildings</TabsTrigger>
+              <TabsTrigger value="communities">Communities</TabsTrigger>
+              <TabsTrigger value="villas">Villas</TabsTrigger>
+              <TabsTrigger value="public">Public Realm</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="buildings" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>Pearl Building Rating System</span>
+                    <Badge variant="outline" className="bg-green-50">PBRS</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    A framework for sustainable design, construction and operation of buildings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p>The Pearl Building Rating System (PBRS) addresses the sustainability of a building's design and construction.</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                    <div className="text-center p-4 bg-green-50 rounded-md">
+                      <i className="ri-water-flash-line text-primary text-2xl"></i>
+                      <p className="mt-2 text-sm">Water Efficiency</p>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-md">
+                      <i className="ri-sun-line text-primary text-2xl"></i>
+                      <p className="mt-2 text-sm">Energy Efficiency</p>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-md">
+                      <i className="ri-recycle-line text-primary text-2xl"></i>
+                      <p className="mt-2 text-sm">Materials Selection</p>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-md">
+                      <i className="ri-home-line text-primary text-2xl"></i>
+                      <p className="mt-2 text-sm">Indoor Quality</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="communities" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>Pearl Community Rating System</span>
+                    <Badge variant="outline" className="bg-green-50">PCRS</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Framework for sustainable design and planning of communities
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>The Pearl Community Rating System (PCRS) promotes the development of sustainable communities. It addresses planning considerations at a larger scale than individual buildings.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="villas" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>Pearl Villa Rating System</span>
+                    <Badge variant="outline" className="bg-green-50">PVRS</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Framework for sustainable design of residential villas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>The Pearl Villa Rating System (PVRS) is designed specifically for residential villas, addressing specific sustainability considerations for residential living spaces.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="public" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-center">
+                    <span>Public Realm Rating System</span>
+                    <Badge variant="outline" className="bg-green-50">PRRS</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Framework for sustainable design of public spaces
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>The Public Realm Rating System addresses sustainability in public spaces, parks, and other community facilities.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
       {/* Features section */}
-      <div className="py-12 bg-white">
+      <div className="py-12 bg-green-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
             <h2 className="text-base text-primary font-semibold tracking-wide uppercase">
@@ -98,7 +303,7 @@ export default function Home() {
 
           <div className="mt-10">
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-              <div className="relative">
+              <div className="relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <dt>
                   <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
                     <i className="ri-ai-generate text-xl"></i>
@@ -109,11 +314,11 @@ export default function Home() {
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-neutral-500">
                   Get instant AI analysis of your submitted documents with actionable
-                  recommendations for improvement.
+                  recommendations for improvement. Our platform learns from successful certifications to provide better guidance.
                 </dd>
               </div>
 
-              <div className="relative">
+              <div className="relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <dt>
                   <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
                     <i className="ri-time-line text-xl"></i>
@@ -124,11 +329,11 @@ export default function Home() {
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-neutral-500">
                   Reduce certification time by up to 50% with our streamlined process and automated
-                  feedback.
+                  feedback. Our platform identifies issues early, eliminating costly revisions.
                 </dd>
               </div>
 
-              <div className="relative">
+              <div className="relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <dt>
                   <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
                     <i className="ri-building-line text-xl"></i>
@@ -139,11 +344,11 @@ export default function Home() {
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-neutral-500">
                   Access our network of approved firms and consultants who can help with your
-                  certification needs.
+                  certification needs. Our platform makes it easy to find qualified experts.
                 </dd>
               </div>
 
-              <div className="relative">
+              <div className="relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <dt>
                   <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
                     <i className="ri-file-list-3-line text-xl"></i>
@@ -154,10 +359,30 @@ export default function Home() {
                 </dt>
                 <dd className="mt-2 ml-16 text-base text-neutral-500">
                   Clear step-by-step guidance through the entire certification process with progress
-                  tracking.
+                  tracking. We've distilled complex requirements into manageable tasks.
                 </dd>
               </div>
             </dl>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-primary">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <span className="block">Ready to get started?</span>
+            <span className="block text-green-100">Join Green Guard today.</span>
+          </h2>
+          <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+            <div className="inline-flex rounded-md shadow">
+              <Button 
+                onClick={() => navigate("/register")}
+                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-green-50 md:py-4 md:text-lg md:px-10"
+              >
+                <i className="ri-user-add-line mr-2"></i> Sign up
+              </Button>
+            </div>
           </div>
         </div>
       </div>
