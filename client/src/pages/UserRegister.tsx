@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import logoImage from "../assets/logo.png";
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -35,7 +36,6 @@ export default function UserRegister() {
       name: "",
       email: "",
       username: "",
-      company: "",
       password: "",
       confirmPassword: "",
     },
@@ -48,7 +48,6 @@ export default function UserRegister() {
         name: values.name,
         email: values.email,
         username: values.username,
-        company: values.company,
         password: values.password,
         role: "user",
       });
@@ -70,8 +69,7 @@ export default function UserRegister() {
         <div className="text-center">
           <div className="flex justify-center">
             <div className="flex items-center">
-              <i className="ri-shield-check-line text-primary text-3xl mr-2"></i>
-              <span className="font-bold text-xl text-primary-dark">Green Guard</span>
+              <img src={logoImage} alt="Green Guard Logo" className="h-14 w-auto" />
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-neutral-900">Create Account</h2>
