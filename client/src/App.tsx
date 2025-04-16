@@ -38,6 +38,7 @@ function Router() {
       <Route path="/admin/reports" component={AdminReports} />
       <Route path="/contact-firms" component={ContactFirms} />
       <Route path="/settings" component={Settings} />
+      <Route path="/admin/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );

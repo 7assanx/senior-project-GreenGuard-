@@ -154,62 +154,64 @@ export default function AdminDashboard() {
                   <ul role="list" className="divide-y divide-neutral-200">
                     {applications && applications.length > 0 ? (
                       <>
-                        <li>
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-primary truncate">
-                                Certification Issued
-                              </p>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                  Completed
+                        {applications.slice(0, 5).map((app) => (
+                          <li key={app.id}>
+                            <div className="px-4 py-4 sm:px-6">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-primary truncate">
+                                  {app.status === "approved" 
+                                    ? "Certification Issued" 
+                                    : app.status === "rejected"
+                                    ? "Application Rejected"
+                                    : app.status === "pending"
+                                    ? "Application Submitted"
+                                    : "Application Updated"}
                                 </p>
+                                <div className="ml-2 flex-shrink-0 flex">
+                                  <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    app.status === "approved" 
+                                      ? "bg-green-100 text-green-800" 
+                                      : app.status === "rejected"
+                                      ? "bg-red-100 text-red-800"
+                                      : app.status === "pending"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-blue-100 text-blue-800"
+                                  }`}>
+                                    {app.status === "approved" 
+                                      ? "Completed" 
+                                      : app.status === "rejected"
+                                      ? "Rejected"
+                                      : app.status === "pending"
+                                      ? "Pending"
+                                      : "In Progress"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="mt-2 sm:flex sm:justify-between">
+                                <div className="sm:flex">
+                                  <p className="flex items-center text-sm text-neutral-500">
+                                    <i className={`${
+                                      app.projectType === "PBRS" 
+                                        ? "ri-building-line" 
+                                        : app.projectType === "PCRS"
+                                        ? "ri-community-line"
+                                        : app.projectType === "PVRS"
+                                        ? "ri-home-4-line"
+                                        : "ri-landscape-line"
+                                    } flex-shrink-0 mr-1.5 text-neutral-400`}></i>
+                                    {app.projectName} ({app.projectType})
+                                  </p>
+                                </div>
+                                <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
+                                  <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
+                                  <p>
+                                    {formatRelativeTime(new Date(app.updatedAt))}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p className="flex items-center text-sm text-neutral-500">
-                                  <i className="ri-building-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                  Sunset Tower Apartments (PBRS)
-                                </p>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
-                                <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                <p>
-                                  {formatRelativeTime(new Date(Date.now() - 3 * 60 * 60 * 1000))}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-primary truncate">
-                                Application Review
-                              </p>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                  In Progress
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p className="flex items-center text-sm text-neutral-500">
-                                  <i className="ri-landscape-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                  Marina Waterfront Park (Public Realm)
-                                </p>
-                              </div>
-                              <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
-                                <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                <p>
-                                  {formatRelativeTime(new Date(Date.now() - 24 * 60 * 60 * 1000))}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
+                          </li>
+                        ))}
                       </>
                     ) : (
                       <li>
