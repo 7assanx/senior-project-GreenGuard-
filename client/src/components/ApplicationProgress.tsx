@@ -3,13 +3,31 @@ import { cn, calculateProgress } from "@/lib/utils";
 import { Application } from "@/lib/types";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 type ApplicationProgressProps = {
   application: Application;
 };
 
 export default function ApplicationProgress({ application }: ApplicationProgressProps) {
-  const progress = application.progress || calculateProgress(application.currentStep, application.status);
+  // Track current application state locally for faster UI updates
+  const [currentApplication, setCurrentApplication] = useState<Application>(application);
+  
+  // Fetch real-time updates to application
+  const { data: updatedApplication } = useQuery<Application>({
+    queryKey: [`/api/applications/${application.id}`],
+    refetchInterval: 3000, // Refresh every 3 seconds
+  });
+  
+  // Update local state when query data changes
+  useEffect(() => {
+    if (updatedApplication) {
+      setCurrentApplication(updatedApplication);
+    }
+  }, [updatedApplication]);
+  
+  const progress = currentApplication.progress || calculateProgress(currentApplication.currentStep, currentApplication.status);
   
   // Use the application status to determine which steps are complete
   const currentStepMap = {
@@ -28,9 +46,9 @@ export default function ApplicationProgress({ application }: ApplicationProgress
   };
   
   // Get the current step index based on application status and currentStep
-  const currentStepIndex = application.status !== "draft" 
+  const currentStepIndex = currentApplication.status !== "draft" 
     ? 3  // If not draft, we've completed all steps
-    : currentStepMap[application.currentStep] || 0;
+    : currentStepMap[currentApplication.currentStep] || 0;
   
   const steps = [
     { 
