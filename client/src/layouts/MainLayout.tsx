@@ -29,42 +29,39 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link href="/">
-                  <a
-                    className={cn(
-                      "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium",
-                      isActive("/")
-                        ? "border-primary text-neutral-900"
-                        : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
-                    )}
-                  >
-                    Home
-                  </a>
-                </Link>
-                <Link href="/about">
-                  <a
-                    className={cn(
-                      "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium",
-                      isActive("/about")
-                        ? "border-primary text-neutral-900"
-                        : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
-                    )}
-                  >
-                    About
-                  </a>
-                </Link>
-                <Link href="/faq">
-                  <a
-                    className={cn(
-                      "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium",
-                      isActive("/faq")
-                        ? "border-primary text-neutral-900"
-                        : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
-                    )}
-                  >
-                    FAQ
-                  </a>
-                </Link>
+                <div
+                  onClick={() => window.location.href = '/'}
+                  className={cn(
+                    "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer",
+                    isActive("/")
+                      ? "border-primary text-neutral-900"
+                      : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
+                  )}
+                >
+                  Home
+                </div>
+                <div
+                  onClick={() => window.location.href = '/about'}
+                  className={cn(
+                    "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer",
+                    isActive("/about")
+                      ? "border-primary text-neutral-900"
+                      : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
+                  )}
+                >
+                  About
+                </div>
+                <div
+                  onClick={() => window.location.href = '/faq'}
+                  className={cn(
+                    "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer",
+                    isActive("/faq")
+                      ? "border-primary text-neutral-900"
+                      : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
+                  )}
+                >
+                  FAQ
+                </div>
               </div>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:items-center">

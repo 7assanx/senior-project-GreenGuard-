@@ -122,8 +122,7 @@ export default function ApplicationCard({
   return (
     <li>
       <div className="block hover:bg-neutral-50 relative">
-        <Link href={href}>
-          <a className="block">
+        <div className="cursor-pointer" onClick={() => navigate(href)}>
             <div className="px-4 py-4 sm:px-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-primary truncate">
@@ -161,8 +160,7 @@ export default function ApplicationCard({
                 </div>
               </div>
             </div>
-          </a>
-        </Link>
+        </div>
         
         {/* Admin Action Buttons (for pending applications) */}
         {isAdmin && application.status === "pending" && (
