@@ -46,18 +46,10 @@ export default function Home() {
                   <div className="mt-5 sm:mt-8 sm:flex flex-wrap sm:justify-center lg:justify-start gap-3">
                     <div className="rounded-md shadow">
                       <Button
-                        onClick={() => navigate("/login")}
+                        onClick={() => setShowPortalSelect(true)}
                         className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark md:py-4 md:text-lg md:px-10"
                       >
-                        <i className="ri-user-line mr-2"></i> User Login
-                      </Button>
-                    </div>
-                    <div className="rounded-md shadow mt-3 sm:mt-0">
-                      <Button
-                        onClick={() => navigate("/admin/login")}
-                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-700 hover:bg-green-800 md:py-4 md:text-lg md:px-10"
-                      >
-                        <i className="ri-admin-line mr-2"></i> Admin Login
+                        <i className="ri-award-line mr-2"></i> Get Your Certification Now
                       </Button>
                     </div>
                     <div className="mt-3 sm:mt-0">
@@ -287,10 +279,10 @@ export default function Home() {
           <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
             <div className="inline-flex rounded-md shadow">
               <Button 
-                onClick={() => navigate("/register")}
+                onClick={() => setShowPortalSelect(true)}
                 className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-green-50 md:py-4 md:text-lg md:px-10"
               >
-                <i className="ri-user-add-line mr-2"></i> Sign up
+                <i className="ri-award-line mr-2"></i> Get Your Certification Now
               </Button>
             </div>
           </div>
