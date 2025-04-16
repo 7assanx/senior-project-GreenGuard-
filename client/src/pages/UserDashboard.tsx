@@ -209,6 +209,8 @@ export default function UserDashboard() {
                                     ? "Application Rejected"
                                     : app.status === "pending"
                                     ? "Application Submitted for Review"
+                                    : app.status === "needs_info"
+                                    ? "Additional Information Requested"
                                     : "Application Updated"}
                                 </p>
                                 <div className="ml-2 flex-shrink-0 flex">
@@ -219,6 +221,8 @@ export default function UserDashboard() {
                                       ? "bg-red-100 text-red-800"
                                       : app.status === "pending"
                                       ? "bg-yellow-100 text-yellow-800"
+                                      : app.status === "needs_info"
+                                      ? "bg-orange-100 text-orange-800"
                                       : "bg-blue-100 text-blue-800"
                                   }`}>
                                     {app.status === "approved" 
@@ -227,6 +231,8 @@ export default function UserDashboard() {
                                       ? "Rejected"
                                       : app.status === "pending"
                                       ? "Pending"
+                                      : app.status === "needs_info"
+                                      ? "Action Required"
                                       : "In Progress"}
                                   </p>
                                 </div>

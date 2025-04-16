@@ -11,7 +11,7 @@ export interface Application {
   userId: number;
   projectName: string;
   projectType: string;
-  status: "draft" | "pending" | "in_progress" | "approved" | "rejected";
+  status: "draft" | "pending" | "in_progress" | "approved" | "rejected" | "needs_info";
   progress: number;
   currentStep: "requirements" | "upload" | "feedback" | "submitted";
   createdAt: Date;
