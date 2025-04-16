@@ -6,10 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import MobileHeader from "@/components/MobileHeader";
 import DocumentItem from "@/components/DocumentItem";
-import AIFeedback from "@/components/AIFeedback";
 import { Application, Document, RequiredDocumentsByType, ProjectType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { calculateProgress } from "@/lib/utils";
@@ -187,11 +185,6 @@ export default function ApplicationPage() {
                       </ul>
                     </div>
                   </div>
-                </div>
-                
-                {/* AI Feedback section */}
-                <div className="mt-8">
-                  <AIFeedback applicationId={applicationId} hasFeedback={hasFeedback} />
                 </div>
                 
                 {/* Action buttons */}
