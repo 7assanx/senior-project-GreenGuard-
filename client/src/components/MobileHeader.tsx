@@ -75,102 +75,95 @@ export default function MobileHeader({ isAdmin = false, title, activePage = "das
               <nav className="mt-5 px-2 space-y-1">
                 {isAdmin ? (
                   <>
-                    <Link href="/admin/dashboard">
-                      <a
-                        className={cn(
-                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                          isActive("dashboard")
-                            ? "bg-primary bg-opacity-25 text-white"
-                            : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                        )}
-                      >
-                        <i className="ri-dashboard-line mr-3 text-white text-lg"></i>
-                        Dashboard
-                      </a>
-                    </Link>
-                    <Link href="/admin/applications">
-                      <a
-                        className={cn(
-                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                          isActive("applications")
-                            ? "bg-primary bg-opacity-25 text-white"
-                            : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                        )}
-                      >
-                        <i className="ri-file-list-3-line mr-3 text-white text-lg"></i>
-                        Applications
-                      </a>
-                    </Link>
-                    <Link href="/admin/reports">
-                      <a
-                        className={cn(
-                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                          isActive("reports")
-                            ? "bg-primary bg-opacity-25 text-white"
-                            : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                        )}
-                      >
-                        <i className="ri-folder-chart-line mr-3 text-white text-lg"></i>
-                        Reports
-                      </a>
-                    </Link>
+                    <div
+                      onClick={() => navigate("/admin/dashboard")}
+                      className={cn(
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                        isActive("dashboard")
+                          ? "bg-primary bg-opacity-25 text-white"
+                          : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                      )}
+                    >
+                      <i className="ri-dashboard-line mr-3 text-white text-lg"></i>
+                      Dashboard
+                    </div>
+                    <div
+                      onClick={() => navigate("/admin/applications")}
+                      className={cn(
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                        isActive("applications")
+                          ? "bg-primary bg-opacity-25 text-white"
+                          : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                      )}
+                    >
+                      <i className="ri-file-list-3-line mr-3 text-white text-lg"></i>
+                      Applications
+                    </div>
+                    <div
+                      onClick={() => navigate("/admin/reports")}
+                      className={cn(
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                        isActive("reports")
+                          ? "bg-primary bg-opacity-25 text-white"
+                          : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                      )}
+                    >
+                      <i className="ri-folder-chart-line mr-3 text-white text-lg"></i>
+                      Reports
+                    </div>
                   </>
                 ) : (
                   <>
-                    <Link href="/dashboard">
-                      <a
-                        className={cn(
-                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                          isActive("dashboard")
-                            ? "bg-primary bg-opacity-25 text-white"
-                            : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                        )}
-                      >
-                        <i className="ri-dashboard-line mr-3 text-white text-lg"></i>
-                        Dashboard
-                      </a>
-                    </Link>
-                    <Link href="/applications">
-                      <a
-                        className={cn(
-                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                          isActive("applications")
-                            ? "bg-primary bg-opacity-25 text-white"
-                            : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                        )}
-                      >
-                        <i className="ri-file-list-3-line mr-3 text-white text-lg"></i>
-                        Applications
-                      </a>
-                    </Link>
-                    <Link href="/contact-firms">
-                      <a
-                        className={cn(
-                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                          isActive("contact-firms")
-                            ? "bg-primary bg-opacity-25 text-white"
-                            : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                        )}
-                      >
-                        <i className="ri-building-2-line mr-3 text-white text-lg"></i>
-                        Contact Firms
-                      </a>
-                    </Link>
+                    <div
+                      onClick={() => navigate("/dashboard")}
+                      className={cn(
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                        isActive("dashboard")
+                          ? "bg-primary bg-opacity-25 text-white"
+                          : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                      )}
+                    >
+                      <i className="ri-dashboard-line mr-3 text-white text-lg"></i>
+                      Dashboard
+                    </div>
+                    <div
+                      onClick={() => navigate("/applications")}
+                      className={cn(
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                        isActive("applications")
+                          ? "bg-primary bg-opacity-25 text-white"
+                          : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                      )}
+                    >
+                      <i className="ri-file-list-3-line mr-3 text-white text-lg"></i>
+                      Applications
+                    </div>
+                    <div
+                      onClick={() => navigate("/contact-firms")}
+                      className={cn(
+                        "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                        isActive("contact-firms")
+                          ? "bg-primary bg-opacity-25 text-white"
+                          : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                      )}
+                    >
+                      <i className="ri-building-2-line mr-3 text-white text-lg"></i>
+                      Contact Firms
+                    </div>
                   </>
                 )}
-                <Link href={isAdmin ? "/admin/settings" : "/settings"}>
-                  <a
-                    className={cn(
-                      "group flex items-center px-2 py-2 text-base font-medium rounded-md",
-                      isActive("settings")
-                        ? "bg-primary bg-opacity-25 text-white"
-                        : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
-                    )}
-                  >
-                    <i className="ri-settings-3-line mr-3 text-white text-lg"></i>
-                    Settings
-                  </a>
-                </Link>
+                <div
+                  onClick={() => navigate(isAdmin ? "/admin/settings" : "/settings")}
+                  className={cn(
+                    "group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer",
+                    isActive("settings")
+                      ? "bg-primary bg-opacity-25 text-white"
+                      : "text-neutral-100 hover:bg-primary hover:bg-opacity-25"
+                  )}
+                >
+                  <i className="ri-settings-3-line mr-3 text-white text-lg"></i>
+                  Settings
+                </div>
               </nav>
             </div>
 
