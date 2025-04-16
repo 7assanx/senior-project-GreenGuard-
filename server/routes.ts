@@ -752,10 +752,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: z.string().default("needs_info")
       }).parse(req.body);
       
-      // Update application status
+      // Update application status and include the feedback message
       await storage.updateApplication(applicationId, {
         status: status,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        feedbackMessage: feedback // Store the feedback message from the admin
       });
       
       // Here you could also add notification logic to inform the user

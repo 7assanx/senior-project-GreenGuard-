@@ -14,6 +14,7 @@ export interface Application {
   status: "draft" | "pending" | "in_progress" | "approved" | "rejected" | "needs_info";
   progress: number;
   currentStep: "requirements" | "upload" | "feedback" | "submitted";
+  feedbackMessage?: string; // Admin feedback for needs_info status
   createdAt: Date;
   updatedAt: Date;
 }

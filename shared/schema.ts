@@ -32,6 +32,7 @@ export const applications = pgTable("applications", {
   status: text("status").notNull().default("draft"),
   progress: integer("progress").notNull().default(0),
   currentStep: text("current_step").notNull().default("requirements"),
+  feedbackMessage: text("feedback_message"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -43,6 +44,7 @@ export const insertApplicationSchema = createInsertSchema(applications).pick({
   status: true,
   progress: true,
   currentStep: true,
+  feedbackMessage: true,
 });
 
 // Documents table

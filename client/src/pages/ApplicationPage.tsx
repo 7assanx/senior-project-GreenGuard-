@@ -128,15 +128,83 @@ export default function ApplicationPage() {
                 <h1 className="text-2xl font-semibold text-neutral-900">
                   {isLoading ? "Loading..." : application?.projectName || "Application"}
                 </h1>
-                <span className="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                  application?.status === "approved" ? "bg-green-100 text-green-800" :
+                  application?.status === "rejected" ? "bg-red-100 text-red-800" :
+                  application?.status === "needs_info" ? "bg-orange-100 text-orange-800" :
+                  "bg-yellow-100 text-yellow-800"
+                }`}>
                   {isLoading ? "Loading..." : application?.status === "draft" ? "In Progress" :
                    application?.status === "pending" ? "Pending Review" :
                    application?.status === "in_progress" ? "Being Processed" :
                    application?.status === "approved" ? "Approved" :
                    application?.status === "rejected" ? "Rejected" :
+                   application?.status === "needs_info" ? "Action Required" :
                    application?.status}
                 </span>
               </div>
+              
+              {/* Notification banner for applications needing more information */}
+              {application?.status === "needs_info" && (
+                <div className="mt-4 bg-orange-50 border-l-4 border-orange-400 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <i className="ri-information-line text-orange-400 text-xl"></i>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-orange-800">Additional Information Requested</h3>
+                      <div className="mt-2 text-sm text-orange-700">
+                        <p>
+                          The certification team needs additional information for your application:
+                        </p>
+                        {application.feedbackMessage ? (
+                          <div className="mt-2 p-3 bg-orange-100 rounded-md">
+                            <p className="text-sm text-orange-900 whitespace-pre-line">
+                              {application.feedbackMessage}
+                            </p>
+                          </div>
+                        ) : (
+                          <p>
+                            Please review the requirements below and update your application documents.
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <div className="-mx-2 -my-1.5 flex">
+                          <Button 
+                            variant="outline"
+                            onClick={async () => {
+                              try {
+                                // Update the application status back to draft so user can edit it
+                                await apiRequest("PATCH", `/api/applications/${applicationId}`, { 
+                                  status: "draft" 
+                                });
+                                
+                                toast({
+                                  title: "Application status updated",
+                                  description: "You can now update your documents.",
+                                });
+                                
+                                // Refresh the application data
+                                queryClient.invalidateQueries({ queryKey: [`/api/applications/${applicationId}`] });
+                              } catch (error) {
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to update application status.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                            className="bg-orange-50 text-orange-800 border-orange-300 hover:bg-orange-100"
+                          >
+                            <i className="ri-edit-line mr-1"></i> Update Documents
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             {isLoading ? (
