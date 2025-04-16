@@ -35,12 +35,17 @@ export default function UserDashboard() {
   const handleCreateApplication = async () => {
     setIsCreatingApplication(true);
     try {
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
+      
       const response = await apiRequest("POST", "/api/applications", {
         projectName: "New Building Project",
         projectType: "PBRS",
         status: "draft",
         progress: 10,
-        currentStep: "requirements"
+        currentStep: "requirements",
+        userId: user.id
       });
       
       const newApplication = await response.json();
@@ -50,8 +55,13 @@ export default function UserDashboard() {
         description: "Your new application has been created successfully!",
       });
       
+      // Refresh applications list
+      await queryClient.invalidateQueries({ queryKey: ["/api/applications"] });
+      
+      // Navigate to the new application
       navigate(`/applications/${newApplication.id}`);
     } catch (error) {
+      console.error("Error creating application:", error);
       toast({
         title: "Error",
         description: "Could not create a new application. Please try again.",

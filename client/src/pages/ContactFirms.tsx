@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -14,8 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function ContactFirms() {
   const { isAuthenticated } = useAuth();
   const [_, navigate] = useLocation();
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedSpecialization, setSelectedSpecialization] = React.useState<string | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSpecialization, setSelectedSpecialization] = useState<string | undefined>(undefined);
 
   // Redirect if not authenticated
   useEffect(() => {
