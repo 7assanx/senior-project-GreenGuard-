@@ -1,0 +1,545 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertUserSchema, insertApplicationSchema, insertDocumentSchema, insertCertificationSchema } from "@shared/schema";
+import { z } from "zod";
+import { ZodError } from "zod";
+import { fromZodError } from "zod-validation-error";
+import express from "express";
+import session from "express-session";
+import MemoryStore from "memorystore";
+
+const MemoryStoreSession = MemoryStore(session);
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Session handling middleware
+  app.use(
+    session({
+      secret: "green-guard-secret",
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: process.env.NODE_ENV === "production", maxAge: 24 * 60 * 60 * 1000 },
+      store: new MemoryStoreSession({
+        checkPeriod: 86400000, // prune expired entries every 24h
+      }),
+    })
+  );
+
+  // Authentication middleware
+  const authenticate = (req: any, res: any, next: any) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+  };
+
+  // Admin middleware
+  const isAdmin = async (req: any, res: any, next: any) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const user = await storage.getUser(req.session.userId);
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    
+    next();
+  };
+
+  // USER ROUTES
+  
+  // Register new user
+  app.post("/api/register", async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if username or email already exists
+      const existingUsername = await storage.getUserByUsername(userData.username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      const existingEmail = await storage.getUserByEmail(userData.email);
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+      
+      const user = await storage.createUser(userData);
+      
+      // Set the user session
+      (req.session as any).userId = user.id;
+      
+      res.status(201).json({ id: user.id, name: user.name, email: user.email, role: user.role });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to register user" });
+    }
+  });
+  
+  // Login
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { username, password } = z.object({
+        username: z.string(),
+        password: z.string()
+      }).parse(req.body);
+      
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      
+      // Set the user session
+      (req.session as any).userId = user.id;
+      
+      res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+  
+  // Get current user
+  app.get("/api/me", authenticate, async (req, res) => {
+    try {
+      const user = await storage.getUser((req.session as any).userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        company: user.company,
+        role: user.role
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get user information" });
+    }
+  });
+  
+  // Logout
+  app.post("/api/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+  
+  // APPLICATION ROUTES
+  
+  // Get user applications
+  app.get("/api/applications", authenticate, async (req, res) => {
+    try {
+      const applications = await storage.getApplicationsByUserId((req.session as any).userId);
+      res.json(applications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+  
+  // Create application
+  app.post("/api/applications", authenticate, async (req, res) => {
+    try {
+      const applicationData = {
+        ...insertApplicationSchema.parse(req.body),
+        userId: (req.session as any).userId
+      };
+      
+      const application = await storage.createApplication(applicationData);
+      res.status(201).json(application);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to create application" });
+    }
+  });
+  
+  // Get single application
+  app.get("/api/applications/:id", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application or is admin
+      const user = await storage.getUser((req.session as any).userId);
+      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      res.json(application);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch application" });
+    }
+  });
+  
+  // Update application
+  app.patch("/api/applications/:id", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application or is admin
+      const user = await storage.getUser((req.session as any).userId);
+      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const updateSchema = z.object({
+        projectName: z.string().optional(),
+        projectType: z.string().optional(),
+        status: z.string().optional(),
+        progress: z.number().optional(),
+        currentStep: z.string().optional()
+      });
+      
+      const applicationUpdate = updateSchema.parse(req.body);
+      const updatedApplication = await storage.updateApplication(applicationId, applicationUpdate);
+      
+      res.json(updatedApplication);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to update application" });
+    }
+  });
+  
+  // DOCUMENT ROUTES
+  
+  // Get documents for an application
+  app.get("/api/applications/:id/documents", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application or is admin
+      const user = await storage.getUser((req.session as any).userId);
+      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const documents = await storage.getDocumentsByApplicationId(applicationId);
+      res.json(documents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch documents" });
+    }
+  });
+  
+  // Upload document
+  app.post("/api/applications/:id/documents", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application
+      if (application.userId !== (req.session as any).userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const documentData = {
+        ...insertDocumentSchema.parse(req.body),
+        applicationId
+      };
+      
+      const document = await storage.createDocument(documentData);
+      
+      // Update application progress
+      const allDocuments = await storage.getDocumentsByApplicationId(applicationId);
+      // Assume each document represents a step in progress
+      const progress = Math.min(Math.round((allDocuments.length / 12) * 100), 100);
+      
+      await storage.updateApplication(applicationId, { 
+        progress,
+        currentStep: "upload",
+        updatedAt: new Date()
+      });
+      
+      res.status(201).json(document);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to upload document" });
+    }
+  });
+  
+  // Delete document
+  app.delete("/api/documents/:id", authenticate, async (req, res) => {
+    try {
+      const documentId = parseInt(req.params.id);
+      const document = await storage.getDocument(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+      
+      // Check if user owns the application
+      const application = await storage.getApplication(document.applicationId);
+      if (!application || application.userId !== (req.session as any).userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const deleted = await storage.deleteDocument(documentId);
+      
+      if (deleted) {
+        // Update application progress
+        const allDocuments = await storage.getDocumentsByApplicationId(document.applicationId);
+        const progress = Math.min(Math.round((allDocuments.length / 12) * 100), 100);
+        
+        await storage.updateApplication(document.applicationId, { 
+          progress,
+          updatedAt: new Date()
+        });
+        
+        res.json({ message: "Document deleted successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to delete document" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete document" });
+    }
+  });
+  
+  // Get AI feedback on documents
+  app.post("/api/applications/:id/feedback", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application
+      if (application.userId !== (req.session as any).userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // This would normally call the OpenAI API, but we'll mock it for now
+      const mockFeedback = {
+        status: "success",
+        feedback: [
+          {
+            documentName: "Energy Efficiency Report",
+            strengths: [
+              "Good coverage of baseline energy consumption data",
+              "Excellent passive design strategies for reducing cooling loads"
+            ],
+            weaknesses: [
+              "Missing detailed HVAC system specifications and efficiency ratings",
+              "Renewable energy integration section needs expansion"
+            ],
+            recommendation: "Add the missing HVAC specifications and expand the renewable energy section before final submission."
+          }
+        ]
+      };
+      
+      // Update application status
+      await storage.updateApplication(applicationId, {
+        currentStep: "feedback",
+        updatedAt: new Date()
+      });
+      
+      res.json(mockFeedback);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get feedback" });
+    }
+  });
+  
+  // Submit application
+  app.post("/api/applications/:id/submit", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application
+      if (application.userId !== (req.session as any).userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Check if there are enough documents
+      const documents = await storage.getDocumentsByApplicationId(applicationId);
+      if (documents.length < 3) { // Arbitrary minimum requirement
+        return res.status(400).json({ message: "Not enough documents uploaded" });
+      }
+      
+      // Update application status
+      await storage.updateApplication(applicationId, {
+        status: "pending",
+        currentStep: "submitted",
+        updatedAt: new Date()
+      });
+      
+      res.json({ message: "Application submitted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to submit application" });
+    }
+  });
+  
+  // CERTIFICATION ROUTES
+  
+  // Get certification for an application
+  app.get("/api/applications/:id/certification", authenticate, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user owns the application or is admin
+      const user = await storage.getUser((req.session as any).userId);
+      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const certification = await storage.getCertificationByApplicationId(applicationId);
+      
+      if (!certification) {
+        return res.status(404).json({ message: "Certification not found" });
+      }
+      
+      res.json(certification);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch certification" });
+    }
+  });
+  
+  // ADMIN ROUTES
+  
+  // Get all applications (admin only)
+  app.get("/api/admin/applications", isAdmin, async (req, res) => {
+    try {
+      const applications = Array.from(
+        (await Promise.all(Array.from({ length: 100 }, (_, i) => storage.getApplication(i + 1))))
+          .filter(app => app !== undefined)
+      ) as any[];
+      
+      // Fetch user details for each application
+      const applicationDetails = await Promise.all(
+        applications.map(async (app) => {
+          const user = await storage.getUser(app.userId);
+          return {
+            ...app,
+            userName: user?.name || "Unknown",
+            userEmail: user?.email || "Unknown",
+          };
+        })
+      );
+      
+      res.json(applicationDetails);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+  
+  // Review and certify application (admin only)
+  app.post("/api/admin/applications/:id/certify", isAdmin, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      const certificationData = insertCertificationSchema.parse({
+        ...req.body,
+        applicationId
+      });
+      
+      // Create certification
+      const certification = await storage.createCertification(certificationData);
+      
+      // Update application status
+      await storage.updateApplication(applicationId, {
+        status: "approved",
+        updatedAt: new Date()
+      });
+      
+      res.status(201).json(certification);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to certify application" });
+    }
+  });
+  
+  // Reject application (admin only)
+  app.post("/api/admin/applications/:id/reject", isAdmin, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      const application = await storage.getApplication(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      const { feedback } = z.object({
+        feedback: z.string()
+      }).parse(req.body);
+      
+      // Update application status
+      await storage.updateApplication(applicationId, {
+        status: "rejected",
+        updatedAt: new Date()
+      });
+      
+      res.json({ message: "Application rejected successfully" });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: fromZodError(error).message });
+      }
+      res.status(500).json({ message: "Failed to reject application" });
+    }
+  });
+  
+  // FIRM ROUTES
+  
+  // Get all approved firms
+  app.get("/api/firms", async (req, res) => {
+    try {
+      const firms = await storage.getAllFirms();
+      res.json(firms);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch firms" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
