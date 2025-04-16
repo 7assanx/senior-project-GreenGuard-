@@ -47,7 +47,7 @@ export default function ContactFirms() {
   });
 
   // Get unique specializations for filter
-  const specializations = [...new Set(firms?.map(firm => firm.specialization))];
+  const specializations = Array.from(new Set(firms?.map(firm => firm.specialization) || []));
 
   return (
     <div className="h-screen flex overflow-hidden bg-neutral-100">

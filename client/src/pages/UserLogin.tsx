@@ -10,6 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -19,11 +28,26 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" }),
+});
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
 export default function UserLogin() {
   const { login } = useAuth();
   const [_, navigate] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [showForgotPasswordDialog, setShowForgotPasswordDialog] = useState(false);
+  
+  const forgotPasswordForm = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -47,6 +71,31 @@ export default function UserLogin() {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+  
+  async function onForgotPasswordSubmit(values: ForgotPasswordFormValues) {
+    setIsResettingPassword(true);
+    try {
+      // Simulate API call to request password reset
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Password reset email sent",
+        description: `If an account with the email ${values.email} exists, you will receive password reset instructions.`,
+      });
+      
+      // Close the dialog after successful submission
+      setShowForgotPasswordDialog(false);
+      forgotPasswordForm.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send password reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResettingPassword(false);
     }
   }
 
@@ -127,9 +176,13 @@ export default function UserLogin() {
               />
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-primary hover:text-primary-dark">
+                <button 
+                  type="button"
+                  onClick={() => setShowForgotPasswordDialog(true)}
+                  className="font-medium text-primary hover:text-primary-dark"
+                >
                   Forgot your password?
-                </a>
+                </button>
               </div>
             </div>
 
@@ -156,6 +209,62 @@ export default function UserLogin() {
           </form>
         </Form>
       </Card>
+      
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPasswordDialog} onOpenChange={setShowForgotPasswordDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reset your password</DialogTitle>
+            <DialogDescription>
+              Enter your email address and we'll send you instructions to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...forgotPasswordForm}>
+            <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
+              <FormField
+                control={forgotPasswordForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="your.email@example.com" 
+                        {...field} 
+                        className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowForgotPasswordDialog(false)}
+                  className="mt-2"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isResettingPassword}
+                  className="mt-2"
+                >
+                  {isResettingPassword ? (
+                    <>
+                      <i className="ri-loader-2-line animate-spin mr-2"></i> Sending...
+                    </>
+                  ) : "Send Reset Instructions"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
