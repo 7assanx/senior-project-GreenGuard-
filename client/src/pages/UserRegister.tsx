@@ -45,6 +45,8 @@ export default function UserRegister() {
   async function onSubmit(values: RegisterFormValues) {
     setIsLoading(true);
     try {
+      console.log("Attempting registration with:", values.username, values.email);
+      
       await register({
         name: values.name,
         email: values.email,
@@ -52,8 +54,12 @@ export default function UserRegister() {
         password: values.password,
         role: "user",
       });
+      
+      console.log("Registration successful");
       // Successful registration will redirect in the AuthContext
     } catch (error) {
+      console.error("Registration error:", error);
+      
       toast({
         title: "Registration failed",
         description: error instanceof Error ? error.message : "Could not create account. Please try again.",

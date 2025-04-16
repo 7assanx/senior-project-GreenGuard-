@@ -109,7 +109,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set the user session
       (req.session as any).userId = user.id;
       
-      res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+      // Save the session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+        res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+      });
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: fromZodError(error).message });

@@ -63,9 +63,12 @@ export default function UserLogin() {
   async function onSubmit(values: LoginFormValues) {
     setIsLoading(true);
     try {
+      console.log("Attempting login with:", values.username);
       await login(values.username, values.password);
+      console.log("Login successful");
       // Successful login will redirect in the AuthContext
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: error instanceof Error ? error.message : "Invalid username or password",
