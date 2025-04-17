@@ -40,7 +40,7 @@ export default function ApplicationListItem({
           }`}>
             {app.status === "approved" ? "Approved" : 
               app.status === "rejected" ? "Rejected" :
-              app.status === "pending" ? "Pending Review" :
+              app.status === "pending" ? "Under Review" :
               app.status === "needs_info" ? "Action Required" :
               "In Progress"}
           </span>
@@ -86,9 +86,9 @@ export default function ApplicationListItem({
               <i className="ri-edit-line mr-1"></i> Continue editing
             </span>
           )}
-          {app.status === "pending" && (
+          {(app.status === "pending" || app.status === "in_progress") && (
             <span className="text-xs text-yellow-600 flex items-center">
-              <i className="ri-eye-line mr-1"></i> View only
+              <i className="ri-eye-line mr-1"></i> View only (under review)
             </span>
           )}
         </div>
