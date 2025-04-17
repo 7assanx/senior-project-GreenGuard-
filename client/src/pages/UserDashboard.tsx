@@ -37,11 +37,15 @@ export default function UserDashboard() {
   const { toast } = useToast();
   const [isCreatingApplication, setIsCreatingApplication] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadingAppId, setDownloadingAppId] = useState<number | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectType, setNewProjectType] = useState("PBRS");
   
   // Function to download certification as PDF
   const downloadCertificate = async (applicationId: number) => {
+    setIsDownloading(true);
+    setDownloadingAppId(applicationId);
     try {
       // Fetch application details
       const response = await apiRequest('GET', `/api/applications/${applicationId}`);
