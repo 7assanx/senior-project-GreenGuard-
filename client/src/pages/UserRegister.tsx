@@ -103,7 +103,8 @@ export default function UserRegister() {
                   <FormControl>
                     <Input 
                       placeholder="Full name" 
-                      {...field} 
+                      {...field}
+                      autoComplete="name"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
@@ -122,7 +123,8 @@ export default function UserRegister() {
                     <Input 
                       type="email" 
                       placeholder="Email address" 
-                      {...field} 
+                      {...field}
+                      autoComplete="email"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
@@ -140,7 +142,8 @@ export default function UserRegister() {
                   <FormControl>
                     <Input 
                       placeholder="Username" 
-                      {...field} 
+                      {...field}
+                      autoComplete="username"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
