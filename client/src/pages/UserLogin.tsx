@@ -138,6 +138,7 @@ export default function UserLogin() {
                     <Input 
                       placeholder="Username" 
                       {...field} 
+                      autoComplete="username"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
@@ -157,9 +158,13 @@ export default function UserLogin() {
                       type="password" 
                       placeholder="Password" 
                       {...field} 
+                      autoComplete="current-password"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
+                  <p className="text-xs text-neutral-500 mt-1">
+                    If your browser shows a password security warning, you can safely continue.
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}

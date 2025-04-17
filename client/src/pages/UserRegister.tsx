@@ -16,7 +16,7 @@ const registerSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  password: z.string().min(1, { message: "Password is required" }),
   confirmPassword: z.string().min(1, { message: "Confirm your password" }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
@@ -161,9 +161,13 @@ export default function UserRegister() {
                       type="password" 
                       placeholder="Password" 
                       {...field} 
+                      autoComplete="new-password"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
+                  <p className="text-xs text-neutral-500 mt-1">
+                    If your browser shows a password security warning, you can safely continue.
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -180,6 +184,7 @@ export default function UserRegister() {
                       type="password" 
                       placeholder="Confirm password" 
                       {...field} 
+                      autoComplete="new-password"
                       className="appearance-none rounded-md relative block w-full px-3 py-2 border border-neutral-300 placeholder-neutral-500 text-neutral-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                     />
                   </FormControl>
