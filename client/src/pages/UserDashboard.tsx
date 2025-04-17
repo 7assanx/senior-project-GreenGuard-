@@ -10,7 +10,7 @@ import ApplicationProgress from "@/components/ApplicationProgress";
 import { Application } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatRelativeTime } from "@/lib/utils";
+import { formatRelativeTime, getProjectTypeLabel, getProjectTypeIcon } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function UserDashboard() {
