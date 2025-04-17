@@ -55,7 +55,8 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       id: "requirements", 
       label: "Document Requirements", 
       description: "Review all required documents",
-      icon: "ri-check-line",
+      icon: "ri-file-list-3-line",
+      completedIcon: "ri-check-line",
       isCompleted: currentStepIndex > 0 || currentApplication.progress >= 25,
       isActive: currentApplication.currentStep === "requirements"
     },
@@ -64,6 +65,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "Upload Documents", 
       description: "Upload the required files",
       icon: "ri-file-upload-line",
+      completedIcon: "ri-check-line",
       isCompleted: currentStepIndex > 1 || currentApplication.progress >= 50,
       isActive: currentApplication.currentStep === "upload"
     },
@@ -72,6 +74,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "AI Feedback", 
       description: "Get AI analysis of your documents",
       icon: "ri-robot-line",
+      completedIcon: "ri-check-line",
       isCompleted: currentStepIndex > 2 || currentApplication.progress >= 75 || currentApplication.status !== "draft",
       isActive: currentApplication.currentStep === "feedback"
     },
@@ -80,6 +83,7 @@ export default function ApplicationProgress({ application }: ApplicationProgress
       label: "Submit Application", 
       description: "Final review and submission",
       icon: "ri-send-plane-line",
+      completedIcon: "ri-check-line",
       isCompleted: currentApplication.status !== "draft" || currentApplication.progress >= 100,
       isActive: currentApplication.currentStep === "submitted"
     }

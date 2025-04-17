@@ -129,8 +129,9 @@ export default function UserDashboard() {
                         title="Approved"
                         value={isLoading ? "..." : applications?.filter(a => a.status === "approved").length || 0}
                         icon="ri-check-double-line"
-                        linkText={hasApprovedApps ? "View certificate" : "View all"}
+                        linkText={hasApprovedApps ? "View certificates" : "View all"}
                         linkHref={certLink}
+                        approvedApplications={applications?.filter(a => a.status === "approved") || []}
                       />
                     );
                   })()}
