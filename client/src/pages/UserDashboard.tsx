@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import MobileHeader from "@/components/MobileHeader";
 import DashboardStat from "@/components/DashboardStat";
-import ApplicationProgress from "@/components/ApplicationProgress";
+import ProgressSection from "@/components/ProgressSection";
 import { Application } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
