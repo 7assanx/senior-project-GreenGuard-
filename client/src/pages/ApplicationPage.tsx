@@ -120,16 +120,20 @@ export default function ApplicationPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Fetch application details
+  // Fetch application details with automatic polling for status updates
   const { data: application, isLoading: isLoadingApplication, error: applicationError } = useQuery<Application>({
     queryKey: [`/api/applications/${applicationId}`],
     enabled: isAuthenticated && !isNaN(applicationId),
+    // Polling every 1.5 seconds for faster updates
+    refetchInterval: 1500,
   });
 
   // Fetch documents for the application
   const { data: documents, isLoading: isLoadingDocuments, error: documentsError } = useQuery<Document[]>({
     queryKey: [`/api/applications/${applicationId}/documents`],
     enabled: isAuthenticated && !isNaN(applicationId),
+    // Also poll documents to keep everything in sync
+    refetchInterval: 1500,
   });
 
   const handleSubmitApplication = async () => {

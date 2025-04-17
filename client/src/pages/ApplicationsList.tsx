@@ -20,10 +20,12 @@ export default function ApplicationsList() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Fetch user's applications
+  // Fetch user's applications with automatic polling for real-time updates
   const { data: applications, isLoading, error } = useQuery<Application[]>({
     queryKey: ["/api/applications"],
     enabled: isAuthenticated,
+    // Add polling interval for faster status updates
+    refetchInterval: 2000,
   });
   
   // Get status color
