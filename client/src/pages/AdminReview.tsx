@@ -389,126 +389,178 @@ export default function AdminReview() {
                       </CardHeader>
                       
                       <CardContent className="px-4 py-5 sm:p-6">
-                        <Form {...form}>
-                          <form onSubmit={(e) => {
-                            e.preventDefault();
-                            const values = form.getValues();
-                            onSubmit(values);
-                          }} className="space-y-6">
-                            <FormField
-                              control={form.control}
-                              name="score"
-                              render={({ field }) => (
-                                <FormItem className="mb-6">
-                                  <FormLabel className="block text-sm font-medium text-neutral-700">Overall Score</FormLabel>
-                                  <div className="mt-1 flex items-center">
-                                    <FormControl>
-                                      <Input 
-                                        type="number" 
-                                        step="0.1"
-                                        min="0"
-                                        max="5"
-                                        {...field} 
-                                        className="shadow-sm focus:ring-primary focus:border-primary block w-32 sm:text-sm border-neutral-300 rounded-md"
-                                      />
-                                    </FormControl>
-                                    <span className="ml-2 text-sm text-neutral-500">out of 5</span>
-                                  </div>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                        {application?.status === "approved" ? (
+                          // View-only mode for approved applications
+                          <div className="space-y-6">
+                            <div className="mb-6">
+                              <h4 className="block text-sm font-medium text-neutral-700 mb-2">Overall Score</h4>
+                              <div className="mt-1 flex items-center">
+                                <span className="text-2xl font-semibold text-primary">{form.getValues().score}</span>
+                                <span className="ml-2 text-sm text-neutral-500">out of 5</span>
+                              </div>
+                            </div>
                             
-                            <FormField
-                              control={form.control}
-                              name="level"
-                              render={({ field }) => (
-                                <FormItem className="mb-6">
-                                  <FormLabel className="block text-sm font-medium text-neutral-700">Certification Level</FormLabel>
-                                  <FormControl>
-                                    <Select
-                                      defaultValue={field.value}
-                                      onValueChange={field.onChange}
-                                    >
-                                      <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select level" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="1 Pearl">1 Pearl</SelectItem>
-                                        <SelectItem value="2 Pearl">2 Pearl</SelectItem>
-                                        <SelectItem value="3 Pearl">3 Pearl</SelectItem>
-                                        <SelectItem value="4 Pearl">4 Pearl</SelectItem>
-                                        <SelectItem value="5 Pearl">5 Pearl</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                            <div className="mb-6">
+                              <h4 className="block text-sm font-medium text-neutral-700 mb-2">Certification Level</h4>
+                              <div className="px-3 py-2 bg-green-50 border border-green-100 rounded-md inline-flex items-center">
+                                <i className="ri-award-fill text-green-600 mr-2"></i>
+                                <span className="text-green-800 font-medium">{form.getValues().level}</span>
+                              </div>
+                            </div>
                             
-                            <FormField
-                              control={form.control}
-                              name="feedback"
-                              render={({ field }) => (
-                                <FormItem className="mb-6">
-                                  <FormLabel className="block text-sm font-medium text-neutral-700">Feedback</FormLabel>
-                                  <FormControl>
-                                    <Textarea 
-                                      rows={6}
-                                      {...field}
-                                      placeholder="Provide detailed feedback on the application..."
-                                      className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-neutral-300 rounded-md"
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                            <div className="mb-6">
+                              <h4 className="block text-sm font-medium text-neutral-700 mb-2">Feedback</h4>
+                              <div className="mt-1 p-3 bg-neutral-50 border border-neutral-200 rounded-md">
+                                <p className="text-neutral-800">{form.getValues().feedback}</p>
+                              </div>
+                            </div>
                             
-                            <FormField
-                              control={form.control}
-                              name="generateCertificate"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-6">
-                                  <FormControl>
-                                    <Switch
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                    />
-                                  </FormControl>
-                                  <div className="space-y-1 leading-none">
-                                    <FormLabel className="text-sm font-medium text-neutral-700">Generate Certificate PDF</FormLabel>
-                                    <p className="text-sm text-neutral-500">A PDF certificate will be generated and made available for download by the applicant.</p>
-                                  </div>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                            <div className="mb-6">
+                              <h4 className="flex items-center text-sm font-medium text-neutral-700 mb-2">
+                                <i className="ri-file-pdf-line mr-1 text-neutral-500"></i>
+                                Certificate PDF
+                              </h4>
+                              <p className="text-sm text-neutral-500 mb-2">
+                                A PDF certificate has been generated and is available for download by the applicant.
+                              </p>
+                              <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-md inline-block">
+                                <span className="text-blue-800 text-sm">Certificate ID: ESTIDAMA-{Date.now().toString().substring(0, 10)}</span>
+                              </div>
+                            </div>
                             
-                            <div className="flex justify-end space-x-3">
+                            <div className="flex justify-end">
                               <Button
                                 type="button"
                                 variant="outline"
-                                onClick={handleRequestMoreInfo}
+                                onClick={() => navigate("/admin/dashboard")}
                               >
-                                Request More Information
-                              </Button>
-                              <Button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="ml-3"
-                              >
-                                {isSubmitting ? (
-                                  <>
-                                    <i className="ri-loader-2-line animate-spin mr-2"></i>
-                                    Processing...
-                                  </>
-                                ) : "Approve Certification"}
+                                Return to Dashboard
                               </Button>
                             </div>
-                          </form>
-                        </Form>
+                          </div>
+                        ) : (
+                          // Editable form for non-approved applications
+                          <Form {...form}>
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              const values = form.getValues();
+                              onSubmit(values);
+                            }} className="space-y-6">
+                              <FormField
+                                control={form.control}
+                                name="score"
+                                render={({ field }) => (
+                                  <FormItem className="mb-6">
+                                    <FormLabel className="block text-sm font-medium text-neutral-700">Overall Score</FormLabel>
+                                    <div className="mt-1 flex items-center">
+                                      <FormControl>
+                                        <Input 
+                                          type="number" 
+                                          step="0.1"
+                                          min="0"
+                                          max="5"
+                                          {...field} 
+                                          className="shadow-sm focus:ring-primary focus:border-primary block w-32 sm:text-sm border-neutral-300 rounded-md"
+                                        />
+                                      </FormControl>
+                                      <span className="ml-2 text-sm text-neutral-500">out of 5</span>
+                                    </div>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name="level"
+                                render={({ field }) => (
+                                  <FormItem className="mb-6">
+                                    <FormLabel className="block text-sm font-medium text-neutral-700">Certification Level</FormLabel>
+                                    <FormControl>
+                                      <Select
+                                        defaultValue={field.value}
+                                        onValueChange={field.onChange}
+                                      >
+                                        <SelectTrigger className="w-full">
+                                          <SelectValue placeholder="Select level" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="1 Pearl">1 Pearl</SelectItem>
+                                          <SelectItem value="2 Pearl">2 Pearl</SelectItem>
+                                          <SelectItem value="3 Pearl">3 Pearl</SelectItem>
+                                          <SelectItem value="4 Pearl">4 Pearl</SelectItem>
+                                          <SelectItem value="5 Pearl">5 Pearl</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name="feedback"
+                                render={({ field }) => (
+                                  <FormItem className="mb-6">
+                                    <FormLabel className="block text-sm font-medium text-neutral-700">Feedback</FormLabel>
+                                    <FormControl>
+                                      <Textarea 
+                                        rows={6}
+                                        {...field}
+                                        placeholder="Provide detailed feedback on the application..."
+                                        className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-neutral-300 rounded-md"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name="generateCertificate"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 mb-6">
+                                    <FormControl>
+                                      <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                      />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                      <FormLabel className="text-sm font-medium text-neutral-700">Generate Certificate PDF</FormLabel>
+                                      <p className="text-sm text-neutral-500">A PDF certificate will be generated and made available for download by the applicant.</p>
+                                    </div>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <div className="flex justify-end space-x-3">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={handleRequestMoreInfo}
+                                >
+                                  Request More Information
+                                </Button>
+                                <Button
+                                  type="submit"
+                                  disabled={isSubmitting}
+                                  className="ml-3"
+                                >
+                                  {isSubmitting ? (
+                                    <>
+                                      <i className="ri-loader-2-line animate-spin mr-2"></i>
+                                      Processing...
+                                    </>
+                                  ) : "Approve Certification"}
+                                </Button>
+                              </div>
+                            </form>
+                          </Form>
+                        )}
                       </CardContent>
                     </Card>
                   </div>

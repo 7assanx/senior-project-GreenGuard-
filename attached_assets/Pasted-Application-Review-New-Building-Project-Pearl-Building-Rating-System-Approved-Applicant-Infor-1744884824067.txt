@@ -1,0 +1,122 @@
+Application Review
+New Building Project (Pearl Building Rating System)
+
+Approved
+Applicant Information
+Applicant name
+Unknown
+Company
+Not specified
+Email address
+Unknown
+Project type
+Pearl Building Rating System
+Submission date
+April 17, 2025
+Document Review
+Review submitted documents and compare against certification requirements.
+
+Energy Efficiency Report
+View Document
+Assessment
+Score:
+
+3 - Meets Requirements
+Review Notes
+The energy efficiency report provides comprehensive analysis of building consumption patterns and efficiency measures. HVAC specifications meet requirements. Renewable energy integration is well-documented. Overall meets Pearl requirements with some innovative approaches.
+Water Management Plan
+View Document
+Assessment
+Score:
+
+2 - Needs Minor Revision
+Review Notes
+Water conservation strategies are well-considered, but greywater recycling system specifications need more detail. Monitoring plan is sufficient. Overall good, but needs minor revisions to fully meet requirements.
+Architectural Floor Plans
+View Document
+Assessment
+Score:
+
+3 - Meets Requirements
+Review Notes
+Floor plans are complete and correctly formatted. Spatial arrangements align with sustainable design principles. Natural lighting and ventilation pathways are well-integrated. Meets all Pearl requirements.
+Materials Specification
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Indoor Air Quality Assessment
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Waste Management Plan
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Site Analysis Report
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Landscaping Plan
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Transportation Plan
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Lighting Design
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Thermal Comfort Analysis
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Commissioning Plan
+View Document
+Assessment
+Score:
+
+0 - Missing Key Elements
+Review Notes
+Certification Decision
+Overall Score
+2.7
+out of 5
+Certification Level
+
+2 Pearl
+
+Feedback
+Congratulations on achieving 2 Pearl certification! Your energy efficiency measures and architectural plans meet the requirements. To improve your rating in the future, please provide more detailed specifications for your greywater recycling system in the water management plan.
+
+
+Generate Certificate PDF
+A PDF certificate will be generated and made available for download by the applicant.
+
+Request More Information
+Approve Certification
