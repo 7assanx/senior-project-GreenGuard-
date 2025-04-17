@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { getInitials } from "@/lib/utils";
+import { getInitials, getProjectTypeIcon } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Application } from "@/lib/types";
 import logoImage from "../assets/logo.png";
+import { useState, useRef, useEffect } from "react";
 
 type SidebarProps = {
   isAdmin?: boolean;
@@ -14,12 +15,28 @@ type SidebarProps = {
 export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: SidebarProps) {
   const { user, logout, isAuthenticated } = useAuth();
   const [_, navigate] = useLocation();
+  const [showApplicationsDropdown, setShowApplicationsDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   
   // Fetch user's applications
   const { data: applications } = useQuery<Application[]>({
     queryKey: ["/api/applications"],
     enabled: isAuthenticated && !isAdmin,
   });
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowApplicationsDropdown(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const isActive = (page: string) => {
     return activePage === page;
@@ -28,6 +45,29 @@ export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: S
   const handleLogout = async () => {
     await logout();
     navigate("/");
+  };
+  
+  // Get status color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "approved": return "bg-green-100 text-green-800";
+      case "rejected": return "bg-red-100 text-red-800";
+      case "pending": return "bg-yellow-100 text-yellow-800";
+      case "needs_info": return "bg-orange-100 text-orange-800";
+      default: return "bg-blue-100 text-blue-800";
+    }
+  };
+  
+  // Get status label
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "approved": return "Approved";
+      case "rejected": return "Rejected";
+      case "pending": return "Pending";
+      case "needs_info": return "Action Required";
+      case "draft": return "In Progress";
+      default: return status;
+    }
   };
 
   return (
@@ -94,23 +134,63 @@ export default function Sidebar({ isAdmin = false, activePage = "dashboard" }: S
                     <i className={`ri-dashboard-line mr-3 text-lg ${isActive("dashboard") ? "text-white" : "text-green-700"}`}></i>
                     Dashboard
                   </div>
-                  <div
-                    onClick={() => {
-                      if (applications && applications.length > 0) {
-                        navigate(`/applications/${applications[0].id}`);
-                      } else {
-                        navigate("/dashboard");
-                      }
-                    }}
-                    className={cn(
-                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer",
-                      isActive("applications")
-                        ? "bg-green-600 text-white"
-                        : "text-green-800 hover:bg-green-200"
+                  <div ref={dropdownRef} className="relative">
+                    <div
+                      onClick={() => setShowApplicationsDropdown(!showApplicationsDropdown)}
+                      className={cn(
+                        "group flex items-center justify-between px-2 py-2 text-sm font-medium rounded-md cursor-pointer",
+                        isActive("applications")
+                          ? "bg-green-600 text-white"
+                          : "text-green-800 hover:bg-green-200"
+                      )}
+                    >
+                      <div className="flex items-center">
+                        <i className={`ri-file-list-3-line mr-3 text-lg ${isActive("applications") ? "text-white" : "text-green-700"}`}></i>
+                        Applications
+                      </div>
+                      <i className={`ri-arrow-down-s-line text-lg ${showApplicationsDropdown ? 'transform rotate-180' : ''}`}></i>
+                    </div>
+                    
+                    {/* Applications Dropdown */}
+                    {showApplicationsDropdown && (
+                      <div className="absolute left-0 mt-2 w-full bg-white rounded-md shadow-lg py-1 z-10 max-h-60 overflow-y-auto">
+                        {applications && applications.length > 0 ? (
+                          applications.map((app) => (
+                            <div 
+                              key={app.id}
+                              onClick={() => {
+                                navigate(`/applications/${app.id}`);
+                                setShowApplicationsDropdown(false);
+                              }}
+                              className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+                            >
+                              <i className={`${getProjectTypeIcon(app.projectType)} mr-2 text-neutral-500`}></i>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-neutral-900 truncate">
+                                  {app.projectName}
+                                </p>
+                              </div>
+                              <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getStatusColor(app.status)}`}>
+                                {getStatusLabel(app.status)}
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-neutral-500">
+                            No applications found
+                          </div>
+                        )}
+                        <div 
+                          onClick={() => {
+                            navigate("/dashboard");
+                            setShowApplicationsDropdown(false);
+                          }}
+                          className="flex items-center justify-center mt-1 px-4 py-2 text-sm text-green-700 hover:bg-green-50 cursor-pointer border-t border-neutral-100"
+                        >
+                          <i className="ri-add-line mr-1"></i> Create New
+                        </div>
+                      </div>
                     )}
-                  >
-                    <i className={`ri-file-list-3-line mr-3 text-lg ${isActive("applications") ? "text-white" : "text-green-700"}`}></i>
-                    Applications
                   </div>
                   <div
                     onClick={() => navigate("/contact-firms")}
