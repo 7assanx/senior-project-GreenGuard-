@@ -15,6 +15,7 @@ import AdminLogin from "@/pages/AdminLogin";
 import UserDashboard from "@/pages/UserDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import ApplicationPage from "@/pages/ApplicationPage";
+import ApplicationsList from "@/pages/ApplicationsList";
 import AdminReview from "@/pages/AdminReview";
 import AdminApplications from "@/pages/AdminApplications";
 import AdminReports from "@/pages/AdminReports";
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/dashboard" component={UserDashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/applications" component={ApplicationsList} />
       <Route path="/applications/:id" component={ApplicationPage} />
       <Route path="/admin/applications" component={AdminApplications} />
       <Route path="/admin/applications/:id" component={AdminReview} />
