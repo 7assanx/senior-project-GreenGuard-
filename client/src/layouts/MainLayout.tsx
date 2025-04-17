@@ -32,36 +32,39 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 </Link>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link href="/">
-                  <a className={cn(
+                <div
+                  onClick={() => navigate("/")}
+                  className={cn(
                     "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer",
                     isActive("/")
                       ? "border-primary text-neutral-900"
                       : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
-                  )}>
-                    Home
-                  </a>
-                </Link>
-                <Link href="/about">
-                  <a className={cn(
+                  )}
+                >
+                  Home
+                </div>
+                <div
+                  onClick={() => navigate("/about")}
+                  className={cn(
                     "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer",
                     isActive("/about")
                       ? "border-primary text-neutral-900"
                       : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
-                  )}>
-                    About
-                  </a>
-                </Link>
-                <Link href="/faq">
-                  <a className={cn(
+                  )}
+                >
+                  About
+                </div>
+                <div
+                  onClick={() => navigate("/faq")}
+                  className={cn(
                     "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer",
                     isActive("/faq")
                       ? "border-primary text-neutral-900"
                       : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
-                  )}>
-                    FAQ
-                  </a>
-                </Link>
+                  )}
+                >
+                  FAQ
+                </div>
               </div>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -99,49 +102,54 @@ export default function MainLayout({ children }: MainLayoutProps) {
         {/* Mobile menu */}
         <div id="mobile-menu" className="sm:hidden hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <Link href="/">
-              <a className={cn(
+            <div
+              onClick={() => navigate("/")}
+              className={cn(
                 "block pl-3 pr-4 py-2 border-l-4 text-base font-medium cursor-pointer",
                 isActive("/")
                   ? "bg-primary-light bg-opacity-10 border-primary text-primary"
                   : "border-transparent text-neutral-500 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-700"
-              )}>
-                Home
-              </a>
-            </Link>
-            <Link href="/about">
-              <a className={cn(
+              )}
+            >
+              Home
+            </div>
+            <div
+              onClick={() => navigate("/about")}
+              className={cn(
                 "block pl-3 pr-4 py-2 border-l-4 text-base font-medium cursor-pointer",
                 isActive("/about")
                   ? "bg-primary-light bg-opacity-10 border-primary text-primary"
                   : "border-transparent text-neutral-500 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-700"
-              )}>
-                About
-              </a>
-            </Link>
-            <Link href="/faq">
-              <a className={cn(
+              )}
+            >
+              About
+            </div>
+            <div
+              onClick={() => navigate("/faq")}
+              className={cn(
                 "block pl-3 pr-4 py-2 border-l-4 text-base font-medium cursor-pointer",
                 isActive("/faq")
                   ? "bg-primary-light bg-opacity-10 border-primary text-primary"
                   : "border-transparent text-neutral-500 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-700"
-              )}>
-                FAQ
-              </a>
-            </Link>
+              )}
+            >
+              FAQ
+            </div>
             <div className="pt-4 pb-3 border-t border-neutral-200">
               {isAuthenticated ? (
-                <Link href="/dashboard">
-                  <a className="block pl-3 pr-4 py-2 text-base font-medium text-primary hover:bg-neutral-50 cursor-pointer">
-                    Dashboard
-                  </a>
-                </Link>
+                <div
+                  onClick={() => navigate("/dashboard")}
+                  className="block pl-3 pr-4 py-2 text-base font-medium text-primary hover:bg-neutral-50 cursor-pointer"
+                >
+                  Dashboard
+                </div>
               ) : (
-                <Link href="/login">
-                  <a className="block pl-3 pr-4 py-2 text-base font-medium text-primary hover:bg-neutral-50 cursor-pointer">
-                    Sign In
-                  </a>
-                </Link>
+                <div
+                  onClick={() => navigate("/login")}
+                  className="block pl-3 pr-4 py-2 text-base font-medium text-primary hover:bg-neutral-50 cursor-pointer"
+                >
+                  Sign In
+                </div>
               )}
             </div>
           </div>

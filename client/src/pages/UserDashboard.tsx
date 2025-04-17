@@ -255,21 +255,7 @@ export default function UserDashboard() {
                                 </div>
                                 
                                 <div className="flex items-center">
-                                  {/* Application Progress Indicator */}
-                                  <div className="hidden md:block mr-4">
-                                    <div className="w-32 bg-neutral-200 rounded-full h-2">
-                                      <div 
-                                        className={`h-2 rounded-full ${
-                                          app.status === "approved" ? "bg-green-500" : 
-                                          app.status === "rejected" ? "bg-red-500" : 
-                                          app.status === "needs_info" ? "bg-orange-500" : 
-                                          "bg-primary"
-                                        }`} 
-                                        style={{width: `${app.progress}%`}}
-                                      ></div>
-                                    </div>
-                                    <p className="text-xs text-neutral-500 mt-1 text-right">{app.progress}% complete</p>
-                                  </div>
+                                  {/* Application Status Only (Progress Removed) */}
                                   
                                   {/* Status Badge */}
                                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
