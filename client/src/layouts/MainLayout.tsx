@@ -70,15 +70,15 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               {isAuthenticated ? (
                 <Link href="/dashboard">
-                  <a className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer">
+                  <div className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer">
                     Dashboard
-                  </a>
+                  </div>
                 </Link>
               ) : (
                 <Link href="/login">
-                  <a className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer">
+                  <div className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm font-medium cursor-pointer">
                     Sign In
-                  </a>
+                  </div>
                 </Link>
               )}
             </div>
