@@ -131,6 +131,9 @@ export default function UserDashboard() {
         description: "Failed to download certificate. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsDownloading(false);
+      setDownloadingAppId(null);
     }
   };
 
@@ -384,9 +387,18 @@ export default function UserDashboard() {
                                         e.stopPropagation(); // Prevent parent link click
                                         downloadCertificate(app.id);
                                       }}
-                                      className="text-xs text-green-600 flex items-center hover:text-green-800 hover:underline"
+                                      disabled={isDownloading && downloadingAppId === app.id}
+                                      className="text-xs text-green-600 flex items-center hover:text-green-800 hover:underline disabled:opacity-50 disabled:hover:text-green-600 disabled:hover:no-underline"
                                     >
-                                      <i className="ri-download-2-line mr-1"></i> Download Certificate
+                                      {isDownloading && downloadingAppId === app.id ? (
+                                        <>
+                                          <i className="ri-loader-2-line animate-spin mr-1"></i> Generating...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <i className="ri-download-2-line mr-1"></i> Download Certificate
+                                        </>
+                                      )}
                                     </button>
                                   )}
                                   {app.status === "needs_info" && (
