@@ -307,7 +307,7 @@ export default function UserDashboard() {
                     </Button>
                   </div>
                 ) : applications && applications.length > 0 ? (
-                  <ApplicationProgress application={applications[0]} />
+                  <ProgressSection applications={applications} />
                 ) : (
                   <Card className="bg-white shadow overflow-hidden sm:rounded-md">
                     <CardHeader className="px-4 py-5 border-b border-neutral-200 sm:px-6">
