@@ -12,12 +12,32 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatRelativeTime, getProjectTypeLabel, getProjectTypeIcon } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function UserDashboard() {
   const { user, isAuthenticated } = useAuth();
   const [_, navigate] = useLocation();
   const { toast } = useToast();
   const [isCreatingApplication, setIsCreatingApplication] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [newProjectType, setNewProjectType] = useState("PBRS");
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -32,7 +52,24 @@ export default function UserDashboard() {
     enabled: isAuthenticated,
   });
 
+  const handleOpenCreateDialog = () => {
+    // Reset form values
+    setNewProjectName("");
+    setNewProjectType("PBRS");
+    setShowCreateDialog(true);
+  };
+
   const handleCreateApplication = async () => {
+    // Validate inputs
+    if (!newProjectName.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter a project name",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsCreatingApplication(true);
     try {
       if (!user) {
@@ -40,8 +77,8 @@ export default function UserDashboard() {
       }
       
       const response = await apiRequest("POST", "/api/applications", {
-        projectName: "New Building Project",
-        projectType: "PBRS",
+        projectName: newProjectName.trim(),
+        projectType: newProjectType,
         status: "draft",
         progress: 10,
         currentStep: "requirements",
@@ -58,7 +95,8 @@ export default function UserDashboard() {
       // Refresh applications list
       await queryClient.invalidateQueries({ queryKey: ["/api/applications"] });
       
-      // Navigate to the new application
+      // Close dialog and navigate to the new application
+      setShowCreateDialog(false);
       navigate(`/applications/${newApplication.id}`);
     } catch (error) {
       console.error("Error creating application:", error);
@@ -141,7 +179,7 @@ export default function UserDashboard() {
               {/* Action Button Row */}
               <div className="mt-6 flex justify-end">
                 <Button
-                  onClick={handleCreateApplication}
+                  onClick={handleOpenCreateDialog}
                   disabled={isCreatingApplication}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
@@ -288,7 +326,7 @@ export default function UserDashboard() {
                         Create your first application to get started with the certification process.
                       </p>
                       <Button
-                        onClick={handleCreateApplication}
+                        onClick={handleOpenCreateDialog}
                         disabled={isCreatingApplication}
                         className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                       >
@@ -359,6 +397,65 @@ export default function UserDashboard() {
           </div>
         </main>
       </div>
+      
+      {/* Create Application Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Application</DialogTitle>
+            <DialogDescription>
+              Enter the details for your new certification application. You'll be able to edit and complete it after creation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="projectName" className="text-right">
+                Project Name
+              </Label>
+              <Input
+                id="projectName"
+                placeholder="e.g. Pearl Tower Project"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="projectType" className="text-right">
+                Project Type
+              </Label>
+              <Select
+                value={newProjectType}
+                onValueChange={setNewProjectType}
+              >
+                <SelectTrigger className="col-span-3" id="projectType">
+                  <SelectValue placeholder="Select project type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PBRS">Pearl Building Rating System</SelectItem>
+                  <SelectItem value="PCRS">Pearl Community Rating System</SelectItem>
+                  <SelectItem value="PVRS">Pearl Villa Rating System</SelectItem>
+                  <SelectItem value="Public Realm">Public Realm</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateApplication} disabled={isCreatingApplication}>
+              {isCreatingApplication ? (
+                <>
+                  <i className="ri-loader-2-line animate-spin mr-2"></i> Creating...
+                </>
+              ) : (
+                "Create Application"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
