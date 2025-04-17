@@ -21,6 +21,7 @@ type DocumentItemProps = {
   uploadedDocument?: Document;
   onUpload?: (document: Document) => void;
   onDelete?: (documentId: number) => void;
+  readOnly?: boolean;
 };
 
 export default function DocumentItem({
@@ -29,6 +30,7 @@ export default function DocumentItem({
   uploadedDocument,
   onUpload,
   onDelete,
+  readOnly = false,
 }: DocumentItemProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -219,41 +221,60 @@ export default function DocumentItem({
         </div>
         <div className="ml-4 flex-shrink-0 flex items-center space-x-2">
           {isUploaded ? (
-            <>
-              {/* AI Analysis button */}
+            readOnly ? (
+              // View-only mode for uploaded documents
               <Button
-                onClick={getAIFeedback}
-                variant="default"
+                variant="outline"
                 size="sm"
-                disabled={isAnalyzing}
-                className={cn(
-                  "inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded shadow-sm text-white",
-                  isAnalyzing ? "bg-primary-light" : "bg-primary hover:bg-primary-dark",
-                  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                )}
+                onClick={() => uploadedDocument && window.open(uploadedDocument.fileUrl, '_blank')}
+                className="inline-flex items-center px-3 py-1.5 border border-neutral-300 text-sm font-medium rounded text-neutral-700 bg-white hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500"
               >
-                {isAnalyzing ? (
-                  <>
-                    <i className="ri-loader-2-line animate-spin mr-1"></i> Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <i className="ri-robot-line mr-1"></i> Get AI
-                  </>
-                )}
+                <i className="ri-eye-line mr-1"></i> View
               </Button>
-              
-              {/* Delete button */}
-              <Button
-                onClick={handleDelete}
-                variant="ghost"
-                size="sm"
-                className="bg-white rounded-md font-medium text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                <i className="ri-delete-bin-line mr-1"></i> Remove
-              </Button>
-            </>
+            ) : (
+              // Editable mode for uploaded documents
+              <>
+                {/* AI Analysis button */}
+                <Button
+                  onClick={getAIFeedback}
+                  variant="default"
+                  size="sm"
+                  disabled={isAnalyzing}
+                  className={cn(
+                    "inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded shadow-sm text-white",
+                    isAnalyzing ? "bg-primary-light" : "bg-primary hover:bg-primary-dark",
+                    "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  )}
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <i className="ri-loader-2-line animate-spin mr-1"></i> Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-robot-line mr-1"></i> Get AI
+                    </>
+                  )}
+                </Button>
+                
+                {/* Delete button */}
+                <Button
+                  onClick={handleDelete}
+                  variant="ghost"
+                  size="sm"
+                  className="bg-white rounded-md font-medium text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <i className="ri-delete-bin-line mr-1"></i> Remove
+                </Button>
+              </>
+            )
+          ) : readOnly ? (
+            // View-only mode for non-uploaded documents
+            <span className="text-sm text-neutral-500 italic">
+              Not uploaded
+            </span>
           ) : (
+            // Upload button for editable mode
             <label className="cursor-pointer">
               <input
                 id={`file-upload-${requiredDocument.name}`}

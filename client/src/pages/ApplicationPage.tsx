@@ -247,6 +247,8 @@ export default function ApplicationPage() {
                               requiredDocument={requiredDoc}
                               applicationId={applicationId}
                               uploadedDocument={uploadedDoc}
+                              // Pass a read-only mode flag if application is no longer editable
+                              readOnly={application?.status !== "draft" && application?.status !== "needs_info"}
                             />
                           );
                         })}
@@ -265,29 +267,39 @@ export default function ApplicationPage() {
                     <i className="ri-arrow-left-line mr-1"></i> Back to Dashboard
                   </Button>
                   
-                  <div className="space-x-3">
+                  {/* Only show action buttons if application is editable (draft status) */}
+                  {application?.status === "draft" ? (
+                    <div className="space-x-3">
+                      <Button
+                        variant="outline"
+                        className="mr-3 inline-flex items-center px-4 py-2 border border-primary text-sm font-medium rounded-md text-primary bg-white hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      >
+                        Save Progress
+                      </Button>
+                      <Button
+                        onClick={handleSubmitApplication}
+                        disabled={!canSubmit || isSubmitting}
+                        className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${canSubmit ? 'bg-primary hover:bg-primary-dark' : 'bg-neutral-400 cursor-not-allowed'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <i className="ri-loader-2-line animate-spin mr-1"></i> Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <i className="ri-send-plane-line mr-1"></i> Submit Application
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ) : application?.status === "approved" ? (
                     <Button
-                      variant="outline"
-                      className="mr-3 inline-flex items-center px-4 py-2 border border-primary text-sm font-medium rounded-md text-primary bg-white hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      onClick={() => window.open(`/api/applications/${applicationId}/certification/download`, '_blank')}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
-                      Save Progress
+                      <i className="ri-download-2-line mr-1"></i> Download Certificate
                     </Button>
-                    <Button
-                      onClick={handleSubmitApplication}
-                      disabled={!canSubmit || isSubmitting}
-                      className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${canSubmit ? 'bg-primary hover:bg-primary-dark' : 'bg-neutral-400 cursor-not-allowed'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <i className="ri-loader-2-line animate-spin mr-1"></i> Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <i className="ri-send-plane-line mr-1"></i> Submit Application
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                  ) : null}
                 </div>
               </div>
             )}

@@ -188,92 +188,173 @@ export default function UserDashboard() {
                 )}
               </div>
 
-              {/* Recent Notifications */}
+              {/* Applications List */}
               <div className="mt-8">
                 <Card className="bg-white shadow overflow-hidden sm:rounded-md">
-                  <CardHeader className="px-4 py-5 border-b border-neutral-200 sm:px-6">
+                  <CardHeader className="px-4 py-5 border-b border-neutral-200 sm:px-6 flex justify-between items-center">
                     <CardTitle className="text-lg leading-6 font-medium text-neutral-900">
-                      Recent Notifications
+                      Your Applications
                     </CardTitle>
                   </CardHeader>
-                  <ul role="list" className="divide-y divide-neutral-200">
-                    {applications && applications.length > 0 ? (
-                      <>
-                        {applications.slice(0, 3).map((app, index) => (
-                          <li key={app.id}>
+                  
+                  {applications && applications.length > 0 ? (
+                    <ul role="list" className="divide-y divide-neutral-200">
+                      {applications.map((app) => (
+                        <li key={app.id} className="hover:bg-neutral-50">
+                          <Link to={`/applications/${app.id}`} className="block">
                             <div className="px-4 py-4 sm:px-6">
                               <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-primary truncate">
-                                  {app.status === "approved" 
-                                    ? "Application Approved" 
-                                    : app.status === "rejected"
-                                    ? "Application Rejected"
-                                    : app.status === "pending"
-                                    ? "Application Submitted for Review"
-                                    : app.status === "needs_info"
-                                    ? "Additional Information Requested"
-                                    : "Application Updated"}
-                                    {app.status === "needs_info" && app.feedbackMessage && (
-                                      <span className="block mt-1 text-xs text-orange-700">
-                                        <i className="ri-information-line mr-1"></i> Admin left feedback - 
-                                        <Link to={`/applications/${app.id}`} className="ml-1 underline font-medium">
-                                          view details
-                                        </Link>
-                                      </span>
-                                    )}
-                                </p>
-                                <div className="ml-2 flex-shrink-0 flex">
-                                  <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    app.status === "approved" 
-                                      ? "bg-green-100 text-green-800" 
-                                      : app.status === "rejected"
-                                      ? "bg-red-100 text-red-800"
-                                      : app.status === "pending"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : app.status === "needs_info"
-                                      ? "bg-orange-100 text-orange-800"
-                                      : "bg-blue-100 text-blue-800"
+                                <div className="flex items-center">
+                                  <i className={`${getProjectTypeIcon(app.projectType)} text-xl text-neutral-500 mr-3`}></i>
+                                  <div>
+                                    <p className="text-sm font-medium text-primary">
+                                      {app.projectName}
+                                    </p>
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                      {getProjectTypeLabel(app.projectType)}
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center">
+                                  {/* Application Progress Indicator */}
+                                  <div className="hidden md:block mr-4">
+                                    <div className="w-32 bg-neutral-200 rounded-full h-2">
+                                      <div 
+                                        className={`h-2 rounded-full ${
+                                          app.status === "approved" ? "bg-green-500" : 
+                                          app.status === "rejected" ? "bg-red-500" : 
+                                          app.status === "needs_info" ? "bg-orange-500" : 
+                                          "bg-primary"
+                                        }`} 
+                                        style={{width: `${app.progress}%`}}
+                                      ></div>
+                                    </div>
+                                    <p className="text-xs text-neutral-500 mt-1 text-right">{app.progress}% complete</p>
+                                  </div>
+                                  
+                                  {/* Status Badge */}
+                                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    app.status === "approved" ? "bg-green-100 text-green-800" : 
+                                    app.status === "rejected" ? "bg-red-100 text-red-800" :
+                                    app.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                    app.status === "needs_info" ? "bg-orange-100 text-orange-800" :
+                                    "bg-blue-100 text-blue-800"
                                   }`}>
-                                    {app.status === "approved" 
-                                      ? "Approved" 
-                                      : app.status === "rejected"
-                                      ? "Rejected"
-                                      : app.status === "pending"
-                                      ? "Pending"
-                                      : app.status === "needs_info"
-                                      ? "Action Required"
-                                      : "In Progress"}
-                                  </p>
+                                    {app.status === "approved" ? "Approved" : 
+                                     app.status === "rejected" ? "Rejected" :
+                                     app.status === "pending" ? "Pending Review" :
+                                     app.status === "needs_info" ? "Action Required" :
+                                     "In Progress"}
+                                  </span>
                                 </div>
                               </div>
-                              <div className="mt-2 sm:flex sm:justify-between">
-                                <div className="sm:flex">
-                                  <p className="flex items-center text-sm text-neutral-500">
-                                    <i className="ri-file-list-3-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                    {app.projectName} ({app.projectType})
-                                  </p>
+                              
+                              <div className="mt-2 flex justify-between items-center">
+                                <div className="text-xs text-neutral-500">
+                                  <i className="ri-time-line mr-1"></i> 
+                                  Last updated {formatRelativeTime(new Date(app.updatedAt))}
                                 </div>
-                                <div className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0">
-                                  <i className="ri-time-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                                  <p>
-                                    {formatRelativeTime(new Date(app.updatedAt))}
-                                  </p>
+                                
+                                {/* Action Indicators */}
+                                <div>
+                                  {app.status === "approved" && (
+                                    <span className="text-xs text-green-600 flex items-center">
+                                      <i className="ri-download-2-line mr-1"></i> Certificate available
+                                    </span>
+                                  )}
+                                  {app.status === "needs_info" && (
+                                    <span className="text-xs text-orange-600 flex items-center">
+                                      <i className="ri-alert-line mr-1"></i> Response needed
+                                    </span>
+                                  )}
+                                  {app.status === "draft" && (
+                                    <span className="text-xs text-blue-600 flex items-center">
+                                      <i className="ri-edit-line mr-1"></i> Continue editing
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
-                          </li>
-                        ))}
-                      </>
-                    ) : (
-                      <li>
-                        <div className="px-4 py-8 text-center">
-                          <p className="text-sm text-neutral-500">No notifications yet</p>
-                        </div>
-                      </li>
-                    )}
-                  </ul>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="px-4 py-8 text-center">
+                      <p className="text-sm text-neutral-500">
+                        You don't have any applications yet. 
+                        <br />
+                        Create your first application to get started with the certification process.
+                      </p>
+                      <Button
+                        onClick={handleCreateApplication}
+                        disabled={isCreatingApplication}
+                        className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      >
+                        {isCreatingApplication ? (
+                          <>
+                            <i className="ri-loader-2-line animate-spin mr-2"></i> Creating...
+                          </>
+                        ) : (
+                          <>
+                            <i className="ri-add-line mr-2"></i> Create Application
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </Card>
               </div>
+              
+              {/* Recent Notifications - Only show when needed */}
+              {applications && applications.some(app => app.status === "needs_info") && (
+                <div className="mt-8">
+                  <Card className="bg-white shadow overflow-hidden sm:rounded-md border-orange-200">
+                    <CardHeader className="px-4 py-5 border-b border-orange-200 sm:px-6 bg-orange-50">
+                      <CardTitle className="text-lg leading-6 font-medium text-orange-800 flex items-center">
+                        <i className="ri-notification-3-line mr-2"></i> 
+                        Applications Requiring Attention
+                      </CardTitle>
+                    </CardHeader>
+                    <ul role="list" className="divide-y divide-orange-100">
+                      {applications.filter(app => app.status === "needs_info").map((app) => (
+                        <li key={app.id} className="bg-orange-50 bg-opacity-30">
+                          <div className="px-4 py-4 sm:px-6">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-orange-800">
+                                Additional Information Requested
+                              </p>
+                              <div className="ml-2 flex-shrink-0 flex">
+                                <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
+                                  Action Required
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-2">
+                              <h4 className="text-sm font-medium">{app.projectName}</h4>
+                              {app.feedbackMessage && (
+                                <div className="mt-2 p-3 bg-white border border-orange-200 rounded-md">
+                                  <p className="text-sm text-neutral-700 whitespace-pre-line">
+                                    {app.feedbackMessage}
+                                  </p>
+                                </div>
+                              )}
+                              <div className="mt-3">
+                                <Link to={`/applications/${app.id}`}>
+                                  <Button variant="outline" size="sm" className="bg-white text-orange-700 border-orange-300 hover:bg-orange-50">
+                                    <i className="ri-edit-line mr-1"></i> Update Application
+                                  </Button>
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                </div>
+              )}
             </div>
           </div>
         </main>
