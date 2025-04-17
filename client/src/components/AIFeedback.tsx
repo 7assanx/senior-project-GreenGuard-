@@ -160,7 +160,7 @@ export default function AIFeedback({ applicationId, hasFeedback = false }: AIFee
               </>
             ) : (
               <>
-                <i className="ri-feedback-line mr-1"></i> {hasFeedbackItems ? "Refresh AI Feedback" : "Get AI Feedback on All Documents"}
+                <i className="ri-feedback-line mr-1"></i> {hasFeedbackItems ? "Refresh AI Feedback" : "AI Feedback on All Documents"}
               </>
             )}
           </Button>

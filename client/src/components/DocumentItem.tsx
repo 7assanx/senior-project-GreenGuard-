@@ -252,7 +252,7 @@ export default function DocumentItem({
                     </>
                   ) : (
                     <>
-                      <i className="ri-robot-line mr-1"></i> Get AI
+                      <i className="ri-robot-line mr-1"></i> AI Feedback
                     </>
                   )}
                 </Button>
