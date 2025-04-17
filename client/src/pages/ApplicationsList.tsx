@@ -136,7 +136,7 @@ export default function ApplicationsList() {
                                 )}
                                 {app.status === "draft" && (
                                   <p className="text-xs text-blue-600 flex items-center">
-                                    <i className="ri-edit-line mr-1"></i> Continue editing
+                                    <i className="ri-edit-line mr-1"></i>
                                   </p>
                                 )}
                               </div>

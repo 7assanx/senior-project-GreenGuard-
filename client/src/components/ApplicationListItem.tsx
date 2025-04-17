@@ -83,12 +83,12 @@ export default function ApplicationListItem({
           )}
           {app.status === "draft" && (
             <span className="text-xs text-blue-600 flex items-center">
-              <i className="ri-edit-line mr-1"></i> Continue editing
+              <i className="ri-edit-line mr-1"></i>
             </span>
           )}
           {(app.status === "pending" || app.status === "in_progress") && (
             <span className="text-xs text-yellow-600 flex items-center">
-              <i className="ri-eye-line mr-1"></i> View only (under review)
+              <i className="ri-eye-line mr-1"></i> View only
             </span>
           )}
         </div>
