@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import MobileHeader from "@/components/MobileHeader";
 import DashboardStat from "@/components/DashboardStat";
 import ProgressSection from "@/components/ProgressSection";
+import ApplicationListItem from "@/components/ApplicationListItem";
 import { Application } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -335,88 +336,36 @@ export default function UserDashboard() {
                   
                   {applications && applications.length > 0 ? (
                     <ul role="list" className="divide-y divide-neutral-200">
-                      {applications.map((app) => (
-                        <li key={app.id} className="hover:bg-neutral-50">
-                          <Link to={`/applications/${app.id}`} className="block">
-                            <div className="px-4 py-4 sm:px-6">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                  <i className={`${getProjectTypeIcon(app.projectType)} text-xl text-neutral-500 mr-3`}></i>
-                                  <div>
-                                    <p className="text-sm font-medium text-primary">
-                                      {app.projectName}
-                                    </p>
-                                    <p className="text-xs text-neutral-500 mt-1">
-                                      {getProjectTypeLabel(app.projectType)}
-                                    </p>
-                                  </div>
-                                </div>
-                                
-                                <div className="flex items-center">
-                                  {/* Application Status Only (Progress Removed) */}
-                                  
-                                  {/* Status Badge */}
-                                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    app.status === "approved" ? "bg-green-100 text-green-800" : 
-                                    app.status === "rejected" ? "bg-red-100 text-red-800" :
-                                    app.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                                    app.status === "needs_info" ? "bg-orange-100 text-orange-800" :
-                                    "bg-blue-100 text-blue-800"
-                                  }`}>
-                                    {app.status === "approved" ? "Approved" : 
-                                     app.status === "rejected" ? "Rejected" :
-                                     app.status === "pending" ? "Pending Review" :
-                                     app.status === "needs_info" ? "Action Required" :
-                                     "In Progress"}
-                                  </span>
-                                </div>
+                      {applications.map((app) => {
+                        // Different rendering approach based on application status
+                        const isViewOnly = app.status === "pending" || app.status === "in_progress" || app.status === "approved" || app.status === "rejected";
+                        
+                        return (
+                          <li key={app.id} className="hover:bg-neutral-50">
+                            {/* For draft or needs_info applications, use Link to allow editing */}
+                            {!isViewOnly ? (
+                              <Link to={`/applications/${app.id}`} className="block">
+                                <ApplicationListItem 
+                                  app={app} 
+                                  isDownloading={isDownloading}
+                                  downloadingAppId={downloadingAppId}
+                                  downloadCertificate={downloadCertificate}
+                                />
+                              </Link>
+                            ) : (
+                              /* For view-only applications, use div to avoid nesting <a> tags */
+                              <div onClick={() => navigate(`/applications/${app.id}`)} className="cursor-pointer">
+                                <ApplicationListItem 
+                                  app={app} 
+                                  isDownloading={isDownloading}
+                                  downloadingAppId={downloadingAppId}
+                                  downloadCertificate={downloadCertificate}
+                                />
                               </div>
-                              
-                              <div className="mt-2 flex justify-between items-center">
-                                <div className="text-xs text-neutral-500">
-                                  <i className="ri-time-line mr-1"></i> 
-                                  Last updated {formatRelativeTime(new Date(app.updatedAt))}
-                                </div>
-                                
-                                {/* Action Indicators */}
-                                <div>
-                                  {app.status === "approved" && (
-                                    <button 
-                                      onClick={(e) => {
-                                        e.preventDefault(); // Prevent link navigation
-                                        e.stopPropagation(); // Prevent parent link click
-                                        downloadCertificate(app.id);
-                                      }}
-                                      disabled={isDownloading && downloadingAppId === app.id}
-                                      className="text-xs text-green-600 flex items-center hover:text-green-800 hover:underline disabled:opacity-50 disabled:hover:text-green-600 disabled:hover:no-underline"
-                                    >
-                                      {isDownloading && downloadingAppId === app.id ? (
-                                        <>
-                                          <i className="ri-loader-2-line animate-spin mr-1"></i> Generating...
-                                        </>
-                                      ) : (
-                                        <>
-                                          <i className="ri-download-2-line mr-1"></i> Download Certificate
-                                        </>
-                                      )}
-                                    </button>
-                                  )}
-                                  {app.status === "needs_info" && (
-                                    <span className="text-xs text-orange-600 flex items-center">
-                                      <i className="ri-alert-line mr-1"></i> Response needed
-                                    </span>
-                                  )}
-                                  {app.status === "draft" && (
-                                    <span className="text-xs text-blue-600 flex items-center">
-                                      <i className="ri-edit-line mr-1"></i> Continue editing
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-                      ))}
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : (
                     <div className="px-4 py-8 text-center">
