@@ -52,6 +52,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     next();
   };
+  
+  // Test route to verify HTML rendering
+  app.get('/test', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Green Guard Test Page</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .container { max-width: 800px; margin: 0 auto; background: #f0f8f0; padding: 20px; border-radius: 8px; }
+            h1 { color: #10B981; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Green Guard Test Page</h1>
+            <p>If you can see this page, the server is working correctly.</p>
+            <p>Try accessing <a href="/">/</a> (home page) or <a href="/login">/login</a> (login page) next.</p>
+          </div>
+        </body>
+      </html>
+    `);
+  });
 
   // USER ROUTES
   
