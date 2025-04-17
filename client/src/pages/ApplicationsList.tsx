@@ -111,28 +111,10 @@ export default function ApplicationsList() {
                                   </div>
                                 </div>
                                 
-                                <div className="flex items-center">
-                                  {/* Application Progress Indicator */}
-                                  <div className="hidden md:block mr-4">
-                                    <div className="w-32 bg-neutral-200 rounded-full h-2">
-                                      <div 
-                                        className={`h-2 rounded-full ${
-                                          app.status === "approved" ? "bg-green-500" : 
-                                          app.status === "rejected" ? "bg-red-500" : 
-                                          app.status === "needs_info" ? "bg-orange-500" : 
-                                          "bg-primary"
-                                        }`} 
-                                        style={{width: `${app.progress}%`}}
-                                      ></div>
-                                    </div>
-                                    <p className="text-xs text-neutral-500 mt-1 text-right">{app.progress}% complete</p>
-                                  </div>
-                                  
-                                  {/* Status Badge */}
-                                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(app.status)}`}>
-                                    {getStatusLabel(app.status)}
-                                  </span>
-                                </div>
+                                {/* Status Badge */}
+                                <p className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(app.status)}`}>
+                                  {getStatusLabel(app.status)}
+                                </p>
                               </div>
                               
                               <div className="mt-2 flex justify-between items-center">
@@ -142,23 +124,21 @@ export default function ApplicationsList() {
                                 </div>
                                 
                                 {/* Action Indicators */}
-                                <div>
-                                  {app.status === "approved" && (
-                                    <span className="text-xs text-green-600 flex items-center">
-                                      <i className="ri-download-2-line mr-1"></i> Certificate available
-                                    </span>
-                                  )}
-                                  {app.status === "needs_info" && (
-                                    <span className="text-xs text-orange-600 flex items-center">
-                                      <i className="ri-alert-line mr-1"></i> Response needed
-                                    </span>
-                                  )}
-                                  {app.status === "draft" && (
-                                    <span className="text-xs text-blue-600 flex items-center">
-                                      <i className="ri-edit-line mr-1"></i> Continue editing
-                                    </span>
-                                  )}
-                                </div>
+                                {app.status === "approved" && (
+                                  <p className="text-xs text-green-600 flex items-center">
+                                    <i className="ri-download-2-line mr-1"></i> Certificate available
+                                  </p>
+                                )}
+                                {app.status === "needs_info" && (
+                                  <p className="text-xs text-orange-600 flex items-center">
+                                    <i className="ri-alert-line mr-1"></i> Response needed
+                                  </p>
+                                )}
+                                {app.status === "draft" && (
+                                  <p className="text-xs text-blue-600 flex items-center">
+                                    <i className="ri-edit-line mr-1"></i> Continue editing
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </Link>
@@ -207,9 +187,9 @@ export default function ApplicationsList() {
                                 <p className="text-sm font-medium text-orange-800">
                                   {app.projectName}
                                 </p>
-                                <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                <p className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
                                   Action Required
-                                </span>
+                                </p>
                               </div>
                               <div className="mt-2">
                                 <p className="text-xs text-orange-700 line-clamp-2">
