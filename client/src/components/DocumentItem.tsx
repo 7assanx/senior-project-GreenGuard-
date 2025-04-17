@@ -222,14 +222,14 @@ export default function DocumentItem({
         <div className="ml-4 flex-shrink-0 flex items-center space-x-2">
           {isUploaded ? (
             readOnly ? (
-              // View-only mode for uploaded documents
+              // View/Download mode for uploaded documents
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => uploadedDocument && window.open(uploadedDocument.fileUrl, '_blank')}
                 className="inline-flex items-center px-3 py-1.5 border border-neutral-300 text-sm font-medium rounded text-neutral-700 bg-white hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500"
               >
-                <i className="ri-eye-line mr-1"></i> View
+                <i className="ri-download-2-line mr-1"></i> Download
               </Button>
             ) : (
               // Editable mode for uploaded documents

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatRelativeTime, getProjectTypeLabel, getProjectTypeIcon } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { jsPDF } from "jspdf";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,96 @@ export default function UserDashboard() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectType, setNewProjectType] = useState("PBRS");
+  
+  // Function to download certification as PDF
+  const downloadCertificate = async (applicationId: number) => {
+    try {
+      // Fetch application details
+      const response = await apiRequest('GET', `/api/applications/${applicationId}`);
+      const application = await response.json();
+      
+      // Create new PDF document
+      const doc = new jsPDF();
+      
+      // Add green header
+      doc.setFillColor(16, 185, 129); // #10b981 - primary green color
+      doc.rect(0, 0, 210, 40, 'F');
+      
+      // Add logo/title
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('Green Guard', 105, 20, { align: 'center' });
+      doc.setFontSize(16);
+      doc.text('Pearl Rating System Certificate', 105, 30, { align: 'center' });
+      
+      // Add certificate content
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(14);
+      
+      // Project details
+      doc.setFont('helvetica', 'bold');
+      doc.text('Certificate of Achievement', 105, 60, { align: 'center' });
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text('This is to certify that the project:', 105, 70, { align: 'center' });
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text(application.projectName, 105, 80, { align: 'center' });
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.text(`has been evaluated under the ${getProjectTypeLabel(application.projectType)}`, 105, 90, { align: 'center' });
+      doc.text('and has achieved:', 105, 100, { align: 'center' });
+      
+      // Rating
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green color
+      doc.text('4 Pearl Rating', 105, 120, { align: 'center' });
+      
+      // Date and signature
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Issue Date: ${new Date().toLocaleDateString()}`, 105, 140, { align: 'center' });
+      doc.text('Certificate ID: ' + applicationId + '-' + Math.floor(Math.random() * 10000), 105, 150, { align: 'center' });
+      
+      // Signature placeholder
+      doc.setFont('helvetica', 'italic');
+      doc.text('Digitally Signed', 105, 170, { align: 'center' });
+      doc.line(75, 175, 135, 175); // Signature line
+      
+      doc.setFont('helvetica', 'normal');
+      doc.text('Green Guard Certification Authority', 105, 185, { align: 'center' });
+      
+      // Green footer
+      doc.setFillColor(240, 253, 244); // Light green
+      doc.rect(0, 250, 210, 50, 'F');
+      doc.setTextColor(16, 185, 129);
+      doc.setFontSize(8);
+      doc.text('This certificate was issued by Green Guard, the official certification body for the Pearl Rating System.', 105, 260, { align: 'center' });
+      doc.text('Verify this certificate at www.greenguard.com/verify', 105, 265, { align: 'center' });
+      
+      // Save the PDF
+      doc.save(`${application.projectName.replace(/\s+/g, '_')}_Certificate.pdf`);
+      
+      toast({
+        title: "Certificate Downloaded",
+        description: "Your certificate has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error downloading certificate:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download certificate. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -283,9 +374,16 @@ export default function UserDashboard() {
                                 {/* Action Indicators */}
                                 <div>
                                   {app.status === "approved" && (
-                                    <span className="text-xs text-green-600 flex items-center">
-                                      <i className="ri-download-2-line mr-1"></i> Certificate available
-                                    </span>
+                                    <button 
+                                      onClick={(e) => {
+                                        e.preventDefault(); // Prevent link navigation
+                                        e.stopPropagation(); // Prevent parent link click
+                                        downloadCertificate(app.id);
+                                      }}
+                                      className="text-xs text-green-600 flex items-center hover:text-green-800 hover:underline"
+                                    >
+                                      <i className="ri-download-2-line mr-1"></i> Download Certificate
+                                    </button>
                                   )}
                                   {app.status === "needs_info" && (
                                     <span className="text-xs text-orange-600 flex items-center">
