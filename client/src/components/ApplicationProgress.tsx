@@ -92,12 +92,22 @@ export default function ApplicationProgress({ application }: ApplicationProgress
   return (
     <Card className="bg-white shadow overflow-hidden sm:rounded-md">
       <CardHeader className="px-4 py-5 border-b border-neutral-200 sm:px-6">
-        <CardTitle className="text-lg leading-6 font-medium text-neutral-900">
-          Active Application
-        </CardTitle>
-        <p className="mt-1 text-sm text-neutral-500">
-          Track your certification process and complete the required steps.
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-lg leading-6 font-medium text-neutral-900">
+              Active Application
+            </CardTitle>
+            <p className="mt-1 text-sm text-neutral-500">
+              Track your certification process and complete the required steps.
+            </p>
+          </div>
+          {currentApplication.status === "needs_info" && (
+            <div className="bg-orange-100 text-orange-800 p-2 rounded-md text-sm flex items-center">
+              <i className="ri-error-warning-line mr-2 text-lg"></i>
+              Action Required
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="px-4 py-5 sm:p-6">
         <div className="mb-6">
@@ -129,6 +139,17 @@ export default function ApplicationProgress({ application }: ApplicationProgress
           </div>
         </div>
 
+        {/* Admin feedback message for "needs_info" status */}
+        {currentApplication.status === "needs_info" && currentApplication.feedbackMessage && (
+          <div className="mb-6 p-4 border border-orange-300 bg-orange-50 rounded-md">
+            <h5 className="font-medium text-orange-800 mb-2 flex items-center">
+              <i className="ri-message-3-line mr-2"></i>
+              Administrator Feedback
+            </h5>
+            <p className="text-sm text-orange-700">{currentApplication.feedbackMessage}</p>
+          </div>
+        )}
+        
         {/* Application steps */}
         <div className="mt-6">
           <nav aria-label="Progress">
@@ -154,11 +175,11 @@ export default function ApplicationProgress({ application }: ApplicationProgress
                       <span className={cn(
                         "relative z-10 w-8 h-8 flex items-center justify-center rounded-full",
                         step.isCompleted ? "bg-primary" : 
-                        step.isActive ? "bg-primary" : 
+                        step.isActive ? "bg-primary animate-pulse" : 
                         "bg-white border-2 border-neutral-300"
                       )}>
                         <i className={cn(
-                          step.icon,
+                          step.isCompleted ? step.completedIcon : step.icon,
                           step.isCompleted || step.isActive ? "text-white" : "text-neutral-400"
                         )}></i>
                       </span>
@@ -184,8 +205,24 @@ export default function ApplicationProgress({ application }: ApplicationProgress
         {/* Action button */}
         <div className="mt-6">
           <Link href={`/applications/${currentApplication.id}`}>
-            <Button variant="default" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-              Continue Application
+            <Button 
+              variant={currentApplication.status === "needs_info" ? "destructive" : "default"} 
+              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
+                currentApplication.status === "needs_info" 
+                  ? "bg-orange-600 hover:bg-orange-700 focus:ring-orange-500" 
+                  : "bg-primary hover:bg-primary-dark focus:ring-primary"
+              } focus:outline-none focus:ring-2 focus:ring-offset-2`}
+            >
+              {currentApplication.status === "needs_info" ? (
+                <>
+                  <i className="ri-error-warning-line mr-2"></i>
+                  Update Documents
+                </>
+              ) : (
+                <>
+                  Continue Application
+                </>
+              )}
             </Button>
           </Link>
         </div>
