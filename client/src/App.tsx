@@ -47,6 +47,7 @@ function Router() {
 }
 
 function App() {
+  // Wrap the application with necessary providers
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

@@ -32,7 +32,7 @@ export default function Home() {
                 <div className="text-center lg:text-left">
                   <h1 className="text-4xl font-extrabold text-neutral-900 sm:text-5xl md:text-6xl">
                     <span className="block">Smart AI-Powered</span>
-                    <span className="block text-primary">Certification Platform</span>
+                    <span className="block text-primary">Building Certification Platform</span>
                   </h1>
                   <p className="mt-3 text-base text-neutral-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                     Streamline the Estidama Pearl Rating certification process with our intelligent
