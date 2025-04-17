@@ -179,7 +179,7 @@ export default function UserDashboard() {
               {/* Action Button Row */}
               <div className="mt-6 flex justify-end">
                 <Button
-                  onClick={handleOpenCreateDialog}
+                  onClick={() => setShowCreateDialog(true)}
                   disabled={isCreatingApplication}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                 >
@@ -326,7 +326,7 @@ export default function UserDashboard() {
                         Create your first application to get started with the certification process.
                       </p>
                       <Button
-                        onClick={handleOpenCreateDialog}
+                        onClick={() => setShowCreateDialog(true)}
                         disabled={isCreatingApplication}
                         className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                       >
