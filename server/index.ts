@@ -70,15 +70,39 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  // Get port from environment or use default 5000
+  const port = process.env.PORT || 5000;
+  
+  // Handle different environments
+  // In Replit: bind to 0.0.0.0
+  // In local development: bind to localhost to avoid ENOTSUP errors
+  const isRunningLocally = process.env.NODE_ENV === 'development' && process.env.REPLIT !== 'true';
+  const host = isRunningLocally ? 'localhost' : '0.0.0.0';
+  
+  // Configure server options based on environment
+  const serverOptions: any = {
+    port: Number(port),
+    host: host,
+  };
+  
+  // Only use reusePort in Replit or production environments
+  if (!isRunningLocally) {
+    serverOptions.reusePort = true;
+  }
+  
+  try {
+    server.listen(serverOptions, () => {
+      log(`Server running at http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    
+    // If binding to 0.0.0.0 fails, try binding to localhost as fallback
+    if (host === '0.0.0.0') {
+      console.log('Trying fallback to localhost...');
+      server.listen(Number(port), 'localhost', () => {
+        log(`Server running at http://localhost:${port} (fallback)`);
+      });
+    }
+  }
 })();
