@@ -204,7 +204,11 @@ export default function ApplicationPage() {
     .filter(doc => doc.required)
     .every(doc => uploadedDocumentNames.includes(doc.name));
   
-  const canSubmit = requiredDocsUploaded && application?.status === "draft";
+  // Allow submission for draft applications and resubmission for rejected/needs_info applications
+  const canSubmit = requiredDocsUploaded && 
+                  (application?.status === "draft" || 
+                   application?.status === "rejected" || 
+                   application?.status === "needs_info");
   const hasFeedback = application?.currentStep === "feedback";
 
   return (
@@ -302,6 +306,68 @@ export default function ApplicationPage() {
                   </div>
                 </div>
               )}
+              
+              {/* Notification banner for rejected applications */}
+              {application?.status === "rejected" && (
+                <div className="mt-4 bg-red-50 border-l-4 border-red-400 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <i className="ri-close-circle-line text-red-400 text-xl"></i>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">Application Rejected</h3>
+                      <div className="mt-2 text-sm text-red-700">
+                        <p>
+                          Your application has been rejected. Please review the feedback below:
+                        </p>
+                        {application.feedbackMessage ? (
+                          <div className="mt-2 p-3 bg-red-100 rounded-md">
+                            <p className="text-sm text-red-900 whitespace-pre-line">
+                              {application.feedbackMessage}
+                            </p>
+                          </div>
+                        ) : (
+                          <p>
+                            Please review your application documents to identify areas of improvement.
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <div className="-mx-2 -my-1.5 flex">
+                          <Button 
+                            variant="outline"
+                            onClick={async () => {
+                              try {
+                                // Update the application status back to draft so user can edit it
+                                await apiRequest("PATCH", `/api/applications/${applicationId}`, { 
+                                  status: "draft" 
+                                });
+                                
+                                toast({
+                                  title: "Application status updated",
+                                  description: "You can now revise your documents and resubmit.",
+                                });
+                                
+                                // Refresh the application data
+                                queryClient.invalidateQueries({ queryKey: [`/api/applications/${applicationId}`] });
+                              } catch (error) {
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to update application status.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                            className="bg-red-50 text-red-800 border-red-300 hover:bg-red-100"
+                          >
+                            <i className="ri-edit-line mr-1"></i> Revise Documents
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             {isLoading ? (
@@ -345,7 +411,10 @@ export default function ApplicationPage() {
                               applicationId={applicationId}
                               uploadedDocument={uploadedDoc}
                               // Pass a read-only mode flag if application is no longer editable
-                              readOnly={application?.status !== "draft" && application?.status !== "needs_info"}
+                              // Allow editing for draft, needs_info, and rejected statuses
+                              readOnly={application?.status !== "draft" && 
+                                       application?.status !== "needs_info" && 
+                                       application?.status !== "rejected"}
                             />
                           );
                         })}
@@ -364,8 +433,8 @@ export default function ApplicationPage() {
                     <i className="ri-arrow-left-line mr-1"></i> Back to Dashboard
                   </Button>
                   
-                  {/* Only show action buttons if application is editable (draft status) */}
-                  {application?.status === "draft" ? (
+                  {/* Show action buttons if application is editable (draft, rejected, or needs_info status) */}
+                  {application?.status === "draft" || application?.status === "rejected" || application?.status === "needs_info" ? (
                     <div className="space-x-3">
                       <Button
                         variant="outline"
@@ -384,7 +453,7 @@ export default function ApplicationPage() {
                           </>
                         ) : (
                           <>
-                            <i className="ri-send-plane-line mr-1"></i> Submit Application
+                            <i className="ri-send-plane-line mr-1"></i> {application?.status === "draft" ? "Submit Application" : "Resubmit Application"}
                           </>
                         )}
                       </Button>
