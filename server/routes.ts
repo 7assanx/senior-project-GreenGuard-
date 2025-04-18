@@ -154,6 +154,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get user by ID - primarily for admin use
+  app.get("/api/users/:id", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const requestedUser = await storage.getUser(userId);
+      
+      if (!requestedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only allow admins to view other users' details
+      const currentUser = req.user!;
+      if (currentUser.id !== userId && currentUser.role !== "admin") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      res.json({
+        id: requestedUser.id,
+        name: requestedUser.name,
+        email: requestedUser.email,
+        company: requestedUser.company,
+        role: requestedUser.role
+      });
+    } catch (error) {
+      console.error("Error getting user:", error);
+      res.status(500).json({ message: "Failed to get user information" });
+    }
+  });
+  
   // Logout - this is now handled by /api/logout in auth.ts
   
   // APPLICATION ROUTES
