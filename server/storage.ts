@@ -21,6 +21,13 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 
+import session from "express-session";
+import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+
+const MemoryStore = createMemoryStore(session);
+const PostgresSessionStore = connectPg(session);
+
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
@@ -61,6 +68,8 @@ export class MemStorage implements IStorage {
   private documents: Map<number, Document>;
   private certifications: Map<number, Certification>;
   private firms: Map<number, Firm>;
+  
+  sessionStore: session.Store;
   
   private userId: number;
   private applicationId: number;

@@ -6,34 +6,15 @@ import { z } from "zod";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import express from "express";
-import session from "express-session";
-import MemoryStore from "memorystore";
-
-const MemoryStoreSession = MemoryStore(session);
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session handling middleware
-  app.use(
-    session({
-      secret: "green-guard-secret",
-      resave: false,
-      saveUninitialized: false, // Changed from true to false
-      cookie: { 
-        secure: false, // Set to false for development, true in production
-        sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        httpOnly: true,
-        path: '/'
-      },
-      store: new MemoryStoreSession({
-        checkPeriod: 86400000, // prune expired entries every 24h
-      }),
-    })
-  );
+  // Setup authentication with Passport.js
+  setupAuth(app);
 
   // Authentication middleware
   const authenticate = (req: any, res: any, next: any) => {
-    if (!req.session.userId) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     next();
@@ -41,11 +22,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin middleware
   const isAdmin = async (req: any, res: any, next: any) => {
-    if (!req.session.userId) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    const user = await storage.getUser(req.session.userId);
+    const user = req.user;
     if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -149,10 +130,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get current user
+  // Get current user - this is now handled by /api/me in auth.ts
+  
+  // We retain this endpoint for backwards compatibility
   app.get("/api/me", authenticate, async (req, res) => {
     try {
-      const user = await storage.getUser((req.session as any).userId);
+      // With Passport, the user is already available on req.user
+      const user = req.user;
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -170,22 +154,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Logout
-  app.post("/api/logout", (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Failed to logout" });
-      }
-      res.json({ message: "Logged out successfully" });
-    });
-  });
+  // Logout - this is now handled by /api/logout in auth.ts
   
   // APPLICATION ROUTES
   
   // Get user applications
   app.get("/api/applications", authenticate, async (req, res) => {
     try {
-      const applications = await storage.getApplicationsByUserId((req.session as any).userId);
+      const applications = await storage.getApplicationsByUserId(req.user!.id);
       res.json(applications);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch applications" });
@@ -197,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const applicationData = {
         ...insertApplicationSchema.parse(req.body),
-        userId: (req.session as any).userId
+        userId: req.user!.id
       };
       
       const application = await storage.createApplication(applicationData);
@@ -221,8 +197,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const user = await storage.getUser((req.session as any).userId);
-      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+      const user = req.user!;
+      if (application.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -243,8 +219,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const user = await storage.getUser((req.session as any).userId);
-      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+      const user = req.user!;
+      if (application.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden" });
       }
       
