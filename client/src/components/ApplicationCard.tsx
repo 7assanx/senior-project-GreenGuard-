@@ -145,10 +145,16 @@ export default function ApplicationCard({
                     <i className={`${icon} flex-shrink-0 mr-1.5 text-neutral-400`}></i>
                     {application.projectType} Certification
                   </p>
-                  {isAdmin && userName && (
+                  {isAdmin && (
                     <p className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0 sm:ml-6">
                       <i className="ri-user-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
-                      {userName}
+                      {userName || "Unknown"}
+                    </p>
+                  )}
+                  {isAdmin && (
+                    <p className="mt-2 flex items-center text-sm text-neutral-500 sm:mt-0 sm:ml-6">
+                      <i className="ri-mail-line flex-shrink-0 mr-1.5 text-neutral-400"></i>
+                      {userEmail || "Unknown"}
                     </p>
                   )}
                 </div>
