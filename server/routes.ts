@@ -306,14 +306,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Assume each document represents a step in progress
       const progress = Math.min(Math.round((allDocuments.length / 12) * 100), 100);
       
-      await storage.updateApplication(applicationId, { 
-        progress,
-        currentStep: "upload",
-        updatedAt: new Date()
-      });
-      
-      res.status(201).json(document);
+      try {
+        const updatedApp = await storage.updateApplication(applicationId, { 
+          progress,
+          currentStep: "upload",
+          updatedAt: new Date()
+        });
+        
+        if (!updatedApp) {
+          console.error("Application update returned null after document creation");
+          throw new Error("Failed to update application progress");
+        }
+        
+        res.status(201).json(document);
+      } catch (updateError) {
+        console.error("Error updating application after document creation:", updateError);
+        // Return the document anyway since it was created successfully
+        res.status(201).json({
+          ...document,
+          warning: "Document was created but application progress wasn't updated"
+        });
+      }
     } catch (error) {
+      console.error("Document upload error:", error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: fromZodError(error).message });
       }
@@ -344,12 +359,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const allDocuments = await storage.getDocumentsByApplicationId(document.applicationId);
         const progress = Math.min(Math.round((allDocuments.length / 12) * 100), 100);
         
-        await storage.updateApplication(document.applicationId, { 
-          progress,
-          updatedAt: new Date()
-        });
-        
-        res.json({ message: "Document deleted successfully" });
+        try {
+          const updatedApp = await storage.updateApplication(document.applicationId, { 
+            progress,
+            updatedAt: new Date()
+          });
+          
+          if (!updatedApp) {
+            console.error("Application update returned null after document deletion");
+            throw new Error("Failed to update application progress");
+          }
+          
+          res.json({ message: "Document deleted successfully" });
+        } catch (updateError) {
+          console.error("Error updating application after document deletion:", updateError);
+          // Still return success since the document was deleted
+          res.json({ 
+            message: "Document deleted successfully but application progress wasn't updated"
+          });
+        }
       } else {
         res.status(500).json({ message: "Failed to delete document" });
       }
@@ -554,14 +582,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update application status
-      await storage.updateApplication(applicationId, {
-        status: "pending",
-        currentStep: "submitted",
-        updatedAt: new Date()
-      });
-      
-      res.json({ message: "Application submitted successfully" });
+      try {
+        const updatedApp = await storage.updateApplication(applicationId, {
+          status: "pending",
+          currentStep: "submitted",
+          updatedAt: new Date()
+        });
+        
+        if (!updatedApp) {
+          console.error("Application update returned null during submission");
+          throw new Error("Failed to update application status");
+        }
+        
+        res.json({ message: "Application submitted successfully" });
+      } catch (updateError) {
+        console.error("Error updating application during submission:", updateError);
+        res.status(500).json({ message: "Failed to update application status" });
+      }
     } catch (error) {
+      console.error("Application submission error:", error);
       res.status(500).json({ message: "Failed to submit application" });
     }
   });
@@ -695,13 +734,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const certification = await storage.createCertification(certificationData);
       
       // Update application status
-      await storage.updateApplication(applicationId, {
-        status: "approved",
-        updatedAt: new Date()
-      });
-      
-      res.status(201).json(certification);
+      try {
+        const updatedApp = await storage.updateApplication(applicationId, {
+          status: "approved",
+          updatedAt: new Date()
+        });
+        
+        if (!updatedApp) {
+          console.error("Application update returned null during certification");
+          throw new Error("Failed to update application status");
+        }
+        
+        res.status(201).json(certification);
+      } catch (updateError) {
+        console.error("Error updating application during certification:", updateError);
+        // Return certification data since it was created successfully
+        res.status(201).json({
+          ...certification,
+          warning: "Certification created but application status wasn't updated"
+        });
+      }
     } catch (error) {
+      console.error("Application certification error:", error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: fromZodError(error).message });
       }
@@ -724,13 +778,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).parse(req.body);
       
       // Update application status
-      await storage.updateApplication(applicationId, {
-        status: "rejected",
-        updatedAt: new Date()
-      });
-      
-      res.json({ message: "Application rejected successfully" });
+      try {
+        const updatedApp = await storage.updateApplication(applicationId, {
+          status: "rejected",
+          updatedAt: new Date()
+        });
+        
+        if (!updatedApp) {
+          console.error("Application update returned null during rejection");
+          throw new Error("Failed to update application status");
+        }
+        
+        res.json({ message: "Application rejected successfully" });
+      } catch (updateError) {
+        console.error("Error updating application during rejection:", updateError);
+        res.status(500).json({ message: "Failed to change application status to rejected" });
+      }
     } catch (error) {
+      console.error("Application rejection error:", error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: fromZodError(error).message });
       }
@@ -754,19 +819,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).parse(req.body);
       
       // Update application status and include the feedback message
-      await storage.updateApplication(applicationId, {
-        status: status,
-        updatedAt: new Date(),
-        feedbackMessage: feedback // Store the feedback message from the admin
-      });
-      
-      // Here you could also add notification logic to inform the user
-      // e.g., store the feedback in a messages collection, send an email, etc.
-      
-      res.json({ 
-        message: "Request for additional information sent successfully",
-        feedback
-      });
+      try {
+        const updatedApp = await storage.updateApplication(applicationId, {
+          status: status,
+          updatedAt: new Date(),
+          feedbackMessage: feedback // Store the feedback message from the admin
+        });
+        
+        if (!updatedApp) {
+          console.error("Application update returned null during info request");
+          throw new Error("Failed to update application with feedback");
+        }
+        
+        // Here you could also add notification logic to inform the user
+        // e.g., store the feedback in a messages collection, send an email, etc.
+        
+        res.json({ 
+          message: "Request for additional information sent successfully",
+          feedback
+        });
+      } catch (updateError) {
+        console.error("Error updating application during info request:", updateError);
+        res.status(500).json({ message: "Failed to save feedback to application" });
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: fromZodError(error).message });
