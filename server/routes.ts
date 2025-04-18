@@ -303,8 +303,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update application progress
       const allDocuments = await storage.getDocumentsByApplicationId(applicationId);
-      // Assume each document represents a step in progress
-      const progress = Math.min(Math.round((allDocuments.length / 12) * 100), 100);
+      // Assume each document represents a step in progress, ensure progress is an integer
+      const progressPercent = (allDocuments.length / 12) * 100;
+      const progress = Math.min(Math.round(progressPercent), 100);
+      console.log('Calculated progress:', progressPercent, '→ rounded to →', progress);
       
       try {
         const updatedApp = await storage.updateApplication(applicationId, { 
@@ -357,7 +359,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (deleted) {
         // Update application progress
         const allDocuments = await storage.getDocumentsByApplicationId(document.applicationId);
-        const progress = Math.min(Math.round((allDocuments.length / 12) * 100), 100);
+        // Calculate progress as integer
+        const progressPercent = (allDocuments.length / 12) * 100;
+        const progress = Math.min(Math.round(progressPercent), 100);
+        console.log('After document deletion - calculated progress:', progressPercent, '→ rounded to →', progress);
         
         try {
           const updatedApp = await storage.updateApplication(document.applicationId, { 

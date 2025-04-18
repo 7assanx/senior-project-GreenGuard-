@@ -117,9 +117,15 @@ export class DatabaseStorage implements IStorage {
     
     // Only copy fields that are defined and not undefined/null
     if (applicationUpdate.status !== undefined) safeUpdate.status = applicationUpdate.status;
-    if (applicationUpdate.progress !== undefined) safeUpdate.progress = applicationUpdate.progress;
     if (applicationUpdate.currentStep !== undefined) safeUpdate.currentStep = applicationUpdate.currentStep;
     if (applicationUpdate.feedbackMessage !== undefined) safeUpdate.feedbackMessage = applicationUpdate.feedbackMessage;
+    
+    // Ensure progress is always an integer
+    if (applicationUpdate.progress !== undefined) {
+      // Round any decimal values to integers
+      safeUpdate.progress = Math.round(Number(applicationUpdate.progress));
+      console.log('Processed progress value:', applicationUpdate.progress, '→', safeUpdate.progress);
+    }
     
     // Always update the updatedAt timestamp
     safeUpdate.updatedAt = new Date();
