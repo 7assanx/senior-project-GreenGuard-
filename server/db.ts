@@ -1,69 +1,86 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import mysql from 'mysql2/promise';
+import { drizzle } from 'drizzle-orm/mysql2';
 import * as schema from "@shared/schema";
 
 /**
- * Configures database connection based on environment
+ * Database configuration for MySQL
  * 
- * Visual Studio Code local development:
+ * Visual Studio Code local development with MySQL:
  * - Create a .env file based on .env.example
- * - Set USE_WEBSOCKET=false if experiencing connection issues
+ * - Set DATABASE_HOST, DATABASE_PORT, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME
  * 
  * Replit environment:
- * - Will use WebSocket connection by default
+ * - Will use the provided DATABASE_URL if available, otherwise fall back to default MySQL config
  */
-try {
-  // Check if we should use WebSocket (default to true)
-  const useWebSocket = process.env.USE_WEBSOCKET !== 'false';
-  
-  if (useWebSocket) {
-    // When in Replit or if explicitly enabled, use WebSockets for Neon DB
-    neonConfig.webSocketConstructor = ws;
-    console.log("Using WebSocket connection for Neon database");
-  } else {
-    console.log("Using direct connection for Neon database (WebSockets disabled)");
-  }
-} catch (err) {
-  console.error("Error configuring database connection:", err);
-  // Fall back to WebSocket connection
-  neonConfig.webSocketConstructor = ws;
-  console.log("Falling back to WebSocket connection after error");
-}
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
-
-// Connection options with better defaults for both environments
-const connectionOptions = {
-  connectionString: process.env.DATABASE_URL,
-  max: 20, // Increase connection pool size
-  idleTimeoutMillis: 30000, // Increase timeout
-  connectionTimeoutMillis: 10000, // Connection timeout
-  keepAlive: true, // Keep connection alive
+// Default connection configuration based on the screenshot
+const DEFAULT_MYSQL_CONFIG = {
+  host: process.env.DATABASE_HOST || 'localhost',
+  port: parseInt(process.env.DATABASE_PORT || '3306', 10),
+  user: process.env.DATABASE_USER || 'root',
+  password: process.env.DATABASE_PASSWORD || 'root',
+  database: process.env.DATABASE_NAME || 'green_guard',
 };
 
-// Add event listeners for debugging
-export const pool = new Pool(connectionOptions);
+// Determine if we're using a connection string or individual parameters
+let connectionConfig: mysql.ConnectionOptions;
 
-// Log pool errors
-pool.on('error', (err) => {
-  console.error('Unexpected error on database client:', err);
-  // Try to reconnect if this is a connection issue
-  // Using type assertion as error code is not in TypeScript definitions
-  const errorCode = (err as any).code;
-  if (errorCode === 'ECONNREFUSED' || errorCode === 'ENOTFOUND') {
-    console.log('Attempting to reconnect to database...');
+if (process.env.DATABASE_URL) {
+  // Parse the connection string if available
+  try {
+    const url = new URL(process.env.DATABASE_URL);
+    connectionConfig = {
+      host: url.hostname,
+      port: parseInt(url.port, 10) || 3306,
+      user: url.username,
+      password: url.password,
+      database: url.pathname.replace(/^\//, ''),
+      ssl: url.searchParams.get('ssl') === 'true' ? {} : undefined,
+    };
+    console.log(`Using database connection string with host ${url.hostname}`);
+  } catch (err) {
+    console.warn(`Invalid DATABASE_URL, falling back to default configuration: ${err}`);
+    connectionConfig = DEFAULT_MYSQL_CONFIG;
   }
-});
+} else {
+  // Use individual parameters
+  connectionConfig = DEFAULT_MYSQL_CONFIG;
+  console.log(`Using MySQL database at ${connectionConfig.host}:${connectionConfig.port}`);
+}
+
+// Log connection details (without sensitive information)
+console.log(`Connecting to MySQL database '${connectionConfig.database}' as user '${connectionConfig.user}'`);
+
+// Create connection pool with better defaults
+const connectionOptions: mysql.PoolOptions = {
+  ...connectionConfig,
+  waitForConnections: true,
+  connectionLimit: 20,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
+};
+
+// Create connection pool
+export let pool: mysql.Pool;
+
+try {
+  pool = mysql.createPool(connectionOptions);
+  console.log("MySQL connection pool created successfully");
+} catch (err) {
+  console.error("Error creating MySQL connection pool:", err);
+  throw new Error("Failed to create database connection pool");
+}
+
+// Test the connection
+pool.query('SELECT 1')
+  .then(() => console.log("Database connection successful"))
+  .catch(err => console.error("Database connection failed:", err));
 
 // Create Drizzle ORM instance with debug logging
-export const db = drizzle({ 
-  client: pool, 
-  schema,
+export const db = drizzle(pool, {
+  schema: schema as any, // Type cast to avoid TypeScript errors
+  mode: 'default', // Required for MySQL configuration
   logger: {
     logQuery: (query, params) => {
       // Only log query text in development to avoid exposing sensitive data

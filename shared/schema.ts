@@ -1,16 +1,16 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { mysqlTable, varchar, int, text, timestamp, json, mysqlEnum } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Users table
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  company: text("company"),
-  role: text("role").notNull().default("user"),
+export const users = mysqlTable("users", {
+  id: int("id").primaryKey().autoincrement(),
+  username: varchar("username", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  company: varchar("company", { length: 255 }),
+  role: mysqlEnum("role", ["user", "admin"]).notNull().default("user"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -24,14 +24,18 @@ export const insertUserSchema = createInsertSchema(users).pick({
 });
 
 // Applications table
-export const applications = pgTable("applications", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  projectName: text("project_name").notNull(),
-  projectType: text("project_type").notNull(),
-  status: text("status").notNull().default("draft"),
-  progress: integer("progress").notNull().default(0),
-  currentStep: text("current_step").notNull().default("requirements"),
+export const applications = mysqlTable("applications", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  projectName: varchar("project_name", { length: 255 }).notNull(),
+  projectType: varchar("project_type", { length: 50 }).notNull(),
+  status: mysqlEnum("status", ["draft", "pending", "in_progress", "approved", "rejected", "needs_info"])
+    .notNull()
+    .default("draft"),
+  progress: int("progress").notNull().default(0),
+  currentStep: mysqlEnum("current_step", ["requirements", "upload", "feedback", "submitted"])
+    .notNull()
+    .default("requirements"),
   feedbackMessage: text("feedback_message"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -48,14 +52,16 @@ export const insertApplicationSchema = createInsertSchema(applications).pick({
 });
 
 // Documents table
-export const documents = pgTable("documents", {
-  id: serial("id").primaryKey(),
-  applicationId: integer("application_id").notNull(),
-  name: text("name").notNull(),
+export const documents = mysqlTable("documents", {
+  id: int("id").primaryKey().autoincrement(),
+  applicationId: int("application_id").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  fileUrl: text("file_url").notNull(),
-  fileType: text("file_type").notNull(),
-  status: text("status").notNull().default("pending"),
+  fileUrl: varchar("file_url", { length: 1000 }).notNull(),
+  fileType: varchar("file_type", { length: 50 }).notNull(),
+  status: mysqlEnum("status", ["pending", "reviewed", "approved", "rejected"])
+    .notNull()
+    .default("pending"),
   feedback: json("feedback"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -72,13 +78,13 @@ export const insertDocumentSchema = createInsertSchema(documents).pick({
 });
 
 // Certifications table
-export const certifications = pgTable("certifications", {
-  id: serial("id").primaryKey(),
-  applicationId: integer("application_id").notNull(),
-  score: integer("score").notNull(),
-  level: text("level").notNull(),
+export const certifications = mysqlTable("certifications", {
+  id: int("id").primaryKey().autoincrement(),
+  applicationId: int("application_id").notNull(),
+  score: int("score").notNull(),
+  level: varchar("level", { length: 50 }).notNull(),
   feedback: text("feedback"),
-  pdfUrl: text("pdf_url"),
+  pdfUrl: varchar("pdf_url", { length: 1000 }),
   issuedAt: timestamp("issued_at").defaultNow(),
 });
 
@@ -91,14 +97,14 @@ export const insertCertificationSchema = createInsertSchema(certifications).pick
 });
 
 // Firms table
-export const firms = pgTable("firms", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  specialization: text("specialization").notNull(),
+export const firms = mysqlTable("firms", {
+  id: int("id").primaryKey().autoincrement(),
+  name: varchar("name", { length: 255 }).notNull(),
+  specialization: varchar("specialization", { length: 255 }).notNull(),
   description: text("description"),
-  contactEmail: text("contact_email").notNull(),
-  contactPhone: text("contact_phone"),
-  website: text("website"),
+  contactEmail: varchar("contact_email", { length: 255 }).notNull(),
+  contactPhone: varchar("contact_phone", { length: 50 }),
+  website: varchar("website", { length: 255 }),
 });
 
 export const insertFirmSchema = createInsertSchema(firms).pick({

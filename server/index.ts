@@ -75,9 +75,11 @@ app.use((req, res, next) => {
   
   // Determine if we're running in Replit or local environment
   // Check both NODE_ENV and the explicit REPLIT flag that might be in .env
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isProduction = process.env.NODE_ENV === 'production';
   const isReplit = process.env.REPLIT === 'true' || 
-                   (process.env.NODE_ENV !== 'development') ||
-                   (typeof process.env.REPLIT === 'undefined' && process.env.NODE_ENV === 'production');
+                   !isDevelopment ||
+                   (typeof process.env.REPLIT === 'undefined' && isProduction);
   
   // In Replit: bind to 0.0.0.0
   // In local development: bind to localhost to avoid ENOTSUP errors

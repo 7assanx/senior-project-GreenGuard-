@@ -18,9 +18,7 @@ import {
 import { db, pool } from "./db";
 import { eq } from "drizzle-orm";
 import session from "express-session";
-import connectPg from "connect-pg-simple";
-
-const PostgresSessionStore = connectPg(session);
+import MemoryStore from 'memorystore';
 
 export interface IStorage {
   // User operations
@@ -62,10 +60,9 @@ export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    const PostgresSessionStore = connectPg(session);
-    this.sessionStore = new PostgresSessionStore({ 
-      pool,
-      createTableIfMissing: true 
+    const MemoryStoreClass = MemoryStore(session);
+    this.sessionStore = new MemoryStoreClass({
+      checkPeriod: 86400000 // prune expired entries every 24h
     });
   }
 
@@ -86,10 +83,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
+    // MySQL doesn't support returning clause, so we insert and then get the record
+    const result = await db
       .insert(users)
-      .values(insertUser)
-      .returning();
+      .values(insertUser);
+    
+    // Use type assertion to access insertId from MySQL result
+    const id = Number((result as any).insertId);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
   
@@ -104,10 +105,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createApplication(insertApplication: InsertApplication): Promise<Application> {
-    const [application] = await db
+    // MySQL doesn't support returning clause, so we insert and then get the record
+    const result = await db
       .insert(applications)
-      .values(insertApplication)
-      .returning();
+      .values(insertApplication);
+      
+    // Use type assertion to access insertId from MySQL result
+    const id = Number((result as any).insertId);
+    const [application] = await db.select().from(applications).where(eq(applications.id, id));
     return application;
   }
   
@@ -133,11 +138,17 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('Updating application', id, 'with data:', safeUpdate);
       
-      const [updatedApplication] = await db
+      // MySQL doesn't support returning clause, so we update and then get the record
+      await db
         .update(applications)
         .set(safeUpdate)
-        .where(eq(applications.id, id))
-        .returning();
+        .where(eq(applications.id, id));
+      
+      // Get the updated record
+      const [updatedApplication] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, id));
         
       console.log('Application updated successfully:', updatedApplication);
       return updatedApplication;
@@ -158,10 +169,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createDocument(insertDocument: InsertDocument): Promise<Document> {
-    const [document] = await db
+    // MySQL doesn't support returning clause, so we insert and then get the record
+    const result = await db
       .insert(documents)
-      .values(insertDocument)
-      .returning();
+      .values(insertDocument);
+      
+    // Use type assertion to access insertId from MySQL result
+    const id = Number((result as any).insertId);
+    const [document] = await db.select().from(documents).where(eq(documents.id, id));
     return document;
   }
   
@@ -183,11 +198,17 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('Updating document', id, 'with data:', safeUpdate);
       
-      const [updatedDocument] = await db
+      // MySQL doesn't support returning clause, so we update and then get the record
+      await db
         .update(documents)
         .set(safeUpdate)
-        .where(eq(documents.id, id))
-        .returning();
+        .where(eq(documents.id, id));
+      
+      // Get the updated record
+      const [updatedDocument] = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.id, id));
       
       console.log('Document updated successfully:', updatedDocument);
       return updatedDocument;
@@ -217,10 +238,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createCertification(insertCertification: InsertCertification): Promise<Certification> {
-    const [certification] = await db
+    // MySQL doesn't support returning clause, so we insert and then get the record
+    const result = await db
       .insert(certifications)
-      .values(insertCertification)
-      .returning();
+      .values(insertCertification);
+      
+    // Use type assertion to access insertId from MySQL result
+    const id = Number((result as any).insertId);
+    const [certification] = await db.select().from(certifications).where(eq(certifications.id, id));
     return certification;
   }
   
@@ -235,10 +260,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createFirm(insertFirm: InsertFirm): Promise<Firm> {
-    const [firm] = await db
+    // MySQL doesn't support returning clause, so we insert and then get the record
+    const result = await db
       .insert(firms)
-      .values(insertFirm)
-      .returning();
+      .values(insertFirm);
+      
+    // Use type assertion to access insertId from MySQL result
+    const id = Number((result as any).insertId);
+    const [firm] = await db.select().from(firms).where(eq(firms.id, id));
     return firm;
   }
 }
