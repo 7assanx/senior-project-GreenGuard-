@@ -3,14 +3,32 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
-// Always use WebSocket for Neon DB connection
-// This is required for Replit and recommended for all environments
+/**
+ * Configures database connection based on environment
+ * 
+ * Visual Studio Code local development:
+ * - Create a .env file based on .env.example
+ * - Set USE_WEBSOCKET=false if experiencing connection issues
+ * 
+ * Replit environment:
+ * - Will use WebSocket connection by default
+ */
 try {
-  // Configure WebSocket for Neon DB
-  neonConfig.webSocketConstructor = ws;
-  console.log("WebSocket configured for Neon database connection");
+  // Check if we should use WebSocket (default to true)
+  const useWebSocket = process.env.USE_WEBSOCKET !== 'false';
+  
+  if (useWebSocket) {
+    // When in Replit or if explicitly enabled, use WebSockets for Neon DB
+    neonConfig.webSocketConstructor = ws;
+    console.log("Using WebSocket connection for Neon database");
+  } else {
+    console.log("Using direct connection for Neon database (WebSockets disabled)");
+  }
 } catch (err) {
-  console.error("Error configuring WebSocket for database:", err);
+  console.error("Error configuring database connection:", err);
+  // Fall back to WebSocket connection
+  neonConfig.webSocketConstructor = ws;
+  console.log("Falling back to WebSocket connection after error");
 }
 
 if (!process.env.DATABASE_URL) {

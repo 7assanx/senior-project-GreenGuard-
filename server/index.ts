@@ -70,14 +70,21 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Get port from environment or use default 5000
+  // Get port from environment variable or use default 5000
   const port = process.env.PORT || 5000;
   
-  // Handle different environments
+  // Determine if we're running in Replit or local environment
+  // Check both NODE_ENV and the explicit REPLIT flag that might be in .env
+  const isReplit = process.env.REPLIT === 'true' || 
+                   (process.env.NODE_ENV !== 'development') ||
+                   (typeof process.env.REPLIT === 'undefined' && process.env.NODE_ENV === 'production');
+  
   // In Replit: bind to 0.0.0.0
   // In local development: bind to localhost to avoid ENOTSUP errors
-  const isRunningLocally = process.env.NODE_ENV === 'development' && process.env.REPLIT !== 'true';
-  const host = isRunningLocally ? 'localhost' : '0.0.0.0';
+  const host = isReplit ? '0.0.0.0' : 'localhost';
+  
+  // Log the environment for debugging
+  log(`Starting server in ${isReplit ? 'Replit' : 'local'} environment`);
   
   // Configure server options based on environment
   const serverOptions: any = {
@@ -85,24 +92,35 @@ app.use((req, res, next) => {
     host: host,
   };
   
-  // Only use reusePort in Replit or production environments
-  if (!isRunningLocally) {
+  // Only use reusePort in Replit environment
+  if (isReplit) {
     serverOptions.reusePort = true;
   }
   
   try {
     server.listen(serverOptions, () => {
-      log(`Server running at http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`);
+      // Always display localhost in the URL for clarity
+      const displayHost = host === '0.0.0.0' ? 'localhost' : host;
+      log(`Server running at http://${displayHost}:${port}`);
+      
+      // Additional environment information
+      log(`Database connection: ${process.env.USE_WEBSOCKET !== 'false' ? 'WebSocket' : 'Direct'}`);
+      log(`Node environment: ${process.env.NODE_ENV || 'not set'}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
     
     // If binding to 0.0.0.0 fails, try binding to localhost as fallback
     if (host === '0.0.0.0') {
-      console.log('Trying fallback to localhost...');
-      server.listen(Number(port), 'localhost', () => {
-        log(`Server running at http://localhost:${port} (fallback)`);
-      });
+      log('Binding to 0.0.0.0 failed, trying fallback to localhost...');
+      try {
+        server.listen(Number(port), 'localhost', () => {
+          log(`Server running at http://localhost:${port} (fallback)`);
+        });
+      } catch (fallbackError) {
+        console.error('Fallback to localhost also failed:', fallbackError);
+        log('CRITICAL: Unable to start server on any interface');
+      }
     }
   }
 })();
