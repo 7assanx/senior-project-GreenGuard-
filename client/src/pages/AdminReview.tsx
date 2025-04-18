@@ -262,7 +262,7 @@ export default function AdminReview() {
                               Applicant name
                             </dt>
                             <dd className="mt-1 text-sm text-neutral-900 sm:mt-0 sm:col-span-2">
-                              {application?.userName || "Unknown"}
+                              {applicant?.name || "Unknown"}
                             </dd>
                           </div>
                           <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -278,7 +278,7 @@ export default function AdminReview() {
                               Email address
                             </dt>
                             <dd className="mt-1 text-sm text-neutral-900 sm:mt-0 sm:col-span-2">
-                              {application?.userEmail || applicant?.email || "Unknown"}
+                              {applicant?.email || "Unknown"}
                             </dd>
                           </div>
                           <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

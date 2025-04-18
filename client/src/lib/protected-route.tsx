@@ -2,8 +2,17 @@ import { ReactNode } from "react";
 import { Route, useLocation } from "wouter";
 import { useAuth } from "@/context/AuthContext";
 
+type RouteParams = { [param: string]: string };
+type ComponentProps = { params: RouteParams };
+
 // Simple wrapper component that adds authentication protection to routes
-export function ProtectedRoute({ path, component: Component, adminOnly = false }) {
+interface ProtectedRouteProps {
+  path: string;
+  component: React.ComponentType<ComponentProps>;
+  adminOnly?: boolean;
+}
+
+export function ProtectedRoute({ path, component: Component, adminOnly = false }: ProtectedRouteProps) {
   return (
     <Route path={path}>
       {(params) => {
@@ -40,6 +49,11 @@ export function ProtectedRoute({ path, component: Component, adminOnly = false }
 }
 
 // Convenience wrapper for admin routes
-export function AdminRoute({ path, component }) {
+interface AdminRouteProps {
+  path: string;
+  component: React.ComponentType<ComponentProps>;
+}
+
+export function AdminRoute({ path, component }: AdminRouteProps) {
   return <ProtectedRoute path={path} component={component} adminOnly={true} />;
 }
