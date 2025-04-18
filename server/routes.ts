@@ -257,8 +257,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const user = await storage.getUser((req.session as any).userId);
-      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+      const user = req.user!;
+      if (application.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -280,7 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application
-      if (application.userId !== (req.session as any).userId) {
+      if (application.userId !== req.user!.id) {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -333,7 +333,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user owns the application
       const application = await storage.getApplication(document.applicationId);
-      if (!application || application.userId !== (req.session as any).userId) {
+      if (!application || application.userId !== req.user!.id) {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -369,8 +369,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const user = await storage.getUser((req.session as any).userId);
-      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+      const user = req.user!;
+      if (application.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -436,8 +436,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const isAdmin = (req.session as any).userRole === 'admin';
-      if (!isAdmin && application.userId !== (req.session as any).userId) {
+      const user = req.user!;
+      const isAdmin = user.role === 'admin';
+      if (!isAdmin && application.userId !== user.id) {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -542,7 +543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application
-      if (application.userId !== (req.session as any).userId) {
+      if (application.userId !== req.user!.id) {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -578,8 +579,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const user = await storage.getUser((req.session as any).userId);
-      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+      const user = req.user!;
+      if (application.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden" });
       }
       
@@ -606,8 +607,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user owns the application or is admin
-      const user = await storage.getUser((req.session as any).userId);
-      if (application.userId !== (req.session as any).userId && user?.role !== "admin") {
+      const user = req.user!;
+      if (application.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ message: "Forbidden" });
       }
       

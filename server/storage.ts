@@ -84,6 +84,10 @@ export class MemStorage implements IStorage {
     this.certifications = new Map();
     this.firms = new Map();
     
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // 24 hours
+    });
+    
     this.userId = 1;
     this.applicationId = 1;
     this.documentId = 1;
