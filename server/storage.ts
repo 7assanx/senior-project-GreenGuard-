@@ -112,12 +112,33 @@ export class DatabaseStorage implements IStorage {
   }
   
   async updateApplication(id: number, applicationUpdate: Partial<Application>): Promise<Application | undefined> {
-    const [updatedApplication] = await db
-      .update(applications)
-      .set(applicationUpdate)
-      .where(eq(applications.id, id))
-      .returning();
-    return updatedApplication;
+    // Ensure we have valid data by handling potential field issues
+    const safeUpdate: Record<string, any> = {};
+    
+    // Only copy fields that are defined and not undefined/null
+    if (applicationUpdate.status !== undefined) safeUpdate.status = applicationUpdate.status;
+    if (applicationUpdate.progress !== undefined) safeUpdate.progress = applicationUpdate.progress;
+    if (applicationUpdate.currentStep !== undefined) safeUpdate.currentStep = applicationUpdate.currentStep;
+    if (applicationUpdate.feedbackMessage !== undefined) safeUpdate.feedbackMessage = applicationUpdate.feedbackMessage;
+    
+    // Always update the updatedAt timestamp
+    safeUpdate.updatedAt = new Date();
+    
+    try {
+      console.log('Updating application', id, 'with data:', safeUpdate);
+      
+      const [updatedApplication] = await db
+        .update(applications)
+        .set(safeUpdate)
+        .where(eq(applications.id, id))
+        .returning();
+        
+      console.log('Application updated successfully:', updatedApplication);
+      return updatedApplication;
+    } catch (error) {
+      console.error('Failed to update application:', error);
+      throw error;
+    }
   }
   
   // Document operations
@@ -139,12 +160,35 @@ export class DatabaseStorage implements IStorage {
   }
   
   async updateDocument(id: number, documentUpdate: Partial<Document>): Promise<Document | undefined> {
-    const [updatedDocument] = await db
-      .update(documents)
-      .set(documentUpdate)
-      .where(eq(documents.id, id))
-      .returning();
-    return updatedDocument;
+    // Ensure we have valid data by handling potential field issues
+    const safeUpdate: Record<string, any> = {};
+    
+    // Only copy fields that are defined and not undefined
+    if (documentUpdate.name !== undefined) safeUpdate.name = documentUpdate.name;
+    if (documentUpdate.description !== undefined) safeUpdate.description = documentUpdate.description;
+    if (documentUpdate.fileUrl !== undefined) safeUpdate.fileUrl = documentUpdate.fileUrl;
+    if (documentUpdate.fileType !== undefined) safeUpdate.fileType = documentUpdate.fileType;
+    if (documentUpdate.status !== undefined) safeUpdate.status = documentUpdate.status;
+    if (documentUpdate.feedback !== undefined) safeUpdate.feedback = documentUpdate.feedback;
+    
+    // Always update the updatedAt timestamp
+    safeUpdate.updatedAt = new Date();
+    
+    try {
+      console.log('Updating document', id, 'with data:', safeUpdate);
+      
+      const [updatedDocument] = await db
+        .update(documents)
+        .set(safeUpdate)
+        .where(eq(documents.id, id))
+        .returning();
+      
+      console.log('Document updated successfully:', updatedDocument);
+      return updatedDocument;
+    } catch (error) {
+      console.error('Failed to update document:', error);
+      throw error;
+    }
   }
   
   async deleteDocument(id: number): Promise<boolean> {
