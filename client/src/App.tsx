@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/AuthContext";
+import { ProtectedRoute, AdminRoute } from "@/lib/protected-route";
 
 // Pages
 import NotFound from "@/pages/not-found";
@@ -25,22 +26,29 @@ import Settings from "@/pages/Settings";
 function Router() {
   return (
     <Switch>
+      {/* Public routes */}
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/faq" component={FAQ} />
       <Route path="/login" component={UserLogin} />
       <Route path="/register" component={UserRegister} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/dashboard" component={UserDashboard} />
-      <Route path="/admin/dashboard" component={AdminDashboard} />
-      <Route path="/applications" component={ApplicationsList} />
-      <Route path="/applications/:id" component={ApplicationPage} />
-      <Route path="/admin/applications" component={AdminApplications} />
-      <Route path="/admin/applications/:id" component={AdminReview} />
-      <Route path="/admin/reports" component={AdminReports} />
-      <Route path="/contact-firms" component={ContactFirms} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/admin/settings" component={Settings} />
+      
+      {/* Protected user routes */}
+      <ProtectedRoute path="/dashboard" component={UserDashboard} />
+      <ProtectedRoute path="/applications" component={ApplicationsList} />
+      <ProtectedRoute path="/applications/:id" component={ApplicationPage} />
+      <ProtectedRoute path="/contact-firms" component={ContactFirms} />
+      <ProtectedRoute path="/settings" component={Settings} />
+      
+      {/* Protected admin routes */}
+      <AdminRoute path="/admin/dashboard" component={AdminDashboard} />
+      <AdminRoute path="/admin/applications" component={AdminApplications} />
+      <AdminRoute path="/admin/applications/:id" component={AdminReview} />
+      <AdminRoute path="/admin/reports" component={AdminReports} />
+      <AdminRoute path="/admin/settings" component={Settings} />
+      
+      {/* Fallback */}
       <Route component={NotFound} />
     </Switch>
   );
