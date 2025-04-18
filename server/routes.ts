@@ -617,18 +617,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update application status
       try {
-        const updatedApp = await storage.updateApplication(applicationId, {
+        // Reset feedback message during resubmission
+        const updateData: any = {
           status: "pending",
           currentStep: "submitted",
           updatedAt: new Date()
-        });
+        };
+        
+        // Clear feedback message when resubmitting 
+        if (application.status === "rejected" || application.status === "needs_info") {
+          updateData.feedbackMessage = null;
+        }
+        
+        const updatedApp = await storage.updateApplication(applicationId, updateData);
         
         if (!updatedApp) {
           console.error("Application update returned null during submission");
           throw new Error("Failed to update application status");
         }
         
-        res.json({ message: "Application submitted successfully" });
+        // Different messages for new submissions vs resubmissions
+        const successMessage = 
+          application.status === "draft" 
+            ? "Application submitted successfully" 
+            : "Application resubmitted successfully";
+            
+        res.json({ message: successMessage });
       } catch (updateError) {
         console.error("Error updating application during submission:", updateError);
         res.status(500).json({ message: "Failed to update application status" });
@@ -811,11 +825,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         feedback: z.string()
       }).parse(req.body);
       
-      // Update application status
+      // Update application status and include feedback message
       try {
         const updatedApp = await storage.updateApplication(applicationId, {
           status: "rejected",
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          feedbackMessage: feedback // Store the feedback message from the admin
         });
         
         if (!updatedApp) {
@@ -823,7 +838,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error("Failed to update application status");
         }
         
-        res.json({ message: "Application rejected successfully" });
+        res.json({ 
+          message: "Application rejected successfully",
+          feedback
+        });
       } catch (updateError) {
         console.error("Error updating application during rejection:", updateError);
         res.status(500).json({ message: "Failed to change application status to rejected" });
